@@ -29,20 +29,6 @@ def get_refs(gitroot):
         yield (name, source, refname)
 
 
-def get_remotes(gitroot):
-    cmd = ("git", "remote", "--verbose")
-    output = subprocess.check_output(cmd, cwd=gitroot).decode()
-    for line in output.splitlines():
-        matchobj = re.match(r"^(\S+)\s+(\S+)\s+\(fetch\)$", line.strip())
-        if not matchobj:
-            continue
-
-        name = matchobj.group(1)
-        url = matchobj.group(2)
-
-        yield (name, url)
-
-
 def get_conf(gitroot, refname, confpath):
     objectname = "{}:{}".format(refname, confpath)
     cmd = ("git", "show", objectname)

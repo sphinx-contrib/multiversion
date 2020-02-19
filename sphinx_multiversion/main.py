@@ -60,8 +60,6 @@ def main(argv=None):
     gitroot = pathlib.Path('.').resolve()
     versions = git.find_versions(str(gitroot), 'source/conf.py', tag_whitelist, branch_whitelist, remote_whitelist)
 
-    remotes = dict(git.get_remotes(str(gitroot)))
-
     with tempfile.TemporaryDirectory() as tmp:
         # Generate Metadata
         metadata = {}
@@ -80,12 +78,8 @@ def main(argv=None):
             # Clone Git repo
             repopath = os.path.join(tmp, str(hash(versionref)))
             srcdir = os.path.join(repopath, sourcedir)
-            if versionref.source.startswith('remotes/'):
-                repo_url = remotes[versionref.source.partition("/")[2]]
-            else:
-                repo_url = gitroot.as_uri()
             try:
-                git.shallow_clone(repo_url, repopath, versionref.name)
+                git.shallow_clone(gitroot.as_uri(), repopath, versionref.name)
             except subprocess.CalledProcessError:
                 outputdirs.remove(outputdir)
                 continue
