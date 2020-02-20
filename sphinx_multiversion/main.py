@@ -92,6 +92,7 @@ def main(argv=None):
             metadata[versionref.name] = {
                 "name": versionref.name,
                 "version": versionref.version,
+                "release": versionref.release,
                 "source": versionref.source,
                 "sourcedir": srcdir,
                 "outputdir": outputdir,

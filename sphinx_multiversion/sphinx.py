@@ -14,7 +14,12 @@ DEFAULT_BRANCH_WHITELIST = r'^.*$'
 DEFAULT_REMOTE_WHITELIST = None
 DEFAULT_OUTPUTDIR_FORMAT = r'{version.version}/{language}'
 
-Version = collections.namedtuple('Version', ['name', 'url', 'version'])
+Version = collections.namedtuple('Version', [
+    'name',
+    'url',
+    'version',
+    'release',
+])
 
 
 class VersionInfo:
@@ -26,15 +31,23 @@ class VersionInfo:
     @property
     def tags(self):
         return [
-            Version(v["name"], self.vpathto(v["name"]), v["version"])
-            for v in self.metadata.values() if v["source"] == "tags"
+            Version(
+                name=v["name"],
+                url=self.vpathto(v["name"]),
+                version=v["version"],
+                release=v["release"],
+            ) for v in self.metadata.values() if v["source"] == "tags"
         ]
 
     @property
     def branches(self):
         return [
-            Version(v["name"], self.vpathto(v["name"]), v["version"])
-            for v in self.metadata.values() if v["source"] != "tags"
+            Version(
+                name=v["name"],
+                url=self.vpathto(v["name"]),
+                version=v["version"],
+                release=v["release"],
+            ) for v in self.metadata.values() if v["source"] != "tags"
         ]
 
     def __iter__(self):
