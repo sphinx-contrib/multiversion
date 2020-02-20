@@ -91,6 +91,7 @@ def main(argv=None):
             project = sphinx_project.Project(srcdir, source_suffixes)
             metadata[versionref.name] = {
                 "name": versionref.name,
+                "version": versionref.version,
                 "source": versionref.source,
                 "sourcedir": srcdir,
                 "outputdir": outputdir,
