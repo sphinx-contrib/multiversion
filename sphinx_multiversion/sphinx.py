@@ -12,6 +12,7 @@ logger = logging.getLogger(__name__)
 DEFAULT_TAG_WHITELIST = r'^.*$'
 DEFAULT_BRANCH_WHITELIST = r'^.*$'
 DEFAULT_REMOTE_WHITELIST = None
+DEFAULT_RELEASED_PATTERN = r'^tags/.*$'
 DEFAULT_OUTPUTDIR_FORMAT = r'{version.version}/{language}'
 
 Version = collections.namedtuple('Version', [
@@ -19,6 +20,7 @@ Version = collections.namedtuple('Version', [
     'url',
     'version',
     'release',
+    'is_released',
 ])
 
 
@@ -35,6 +37,7 @@ class VersionInfo:
             url=self.vpathto(v["name"]),
             version=v["version"],
             release=v["release"],
+            is_released=v["is_released"],
         )
 
     @property
@@ -46,6 +49,16 @@ class VersionInfo:
     def branches(self):
         return [self._dict_to_versionobj(v) for v in self.metadata.values()
                 if v["source"] != "tags"]
+
+    @property
+    def releases(self):
+        return [self._dict_to_versionobj(v) for v in self.metadata.values()
+                if v["is_released"]]
+
+    @property
+    def in_development(self):
+        return [self._dict_to_versionobj(v) for v in self.metadata.values()
+                if not v["is_released"]]
 
     def __iter__(self):
         for item in self.tags:
@@ -146,6 +159,7 @@ def setup(app):
     app.add_config_value("smv_tag_whitelist", DEFAULT_TAG_WHITELIST, "html")
     app.add_config_value("smv_branch_whitelist", DEFAULT_BRANCH_WHITELIST, "html")
     app.add_config_value("smv_remote_whitelist", DEFAULT_REMOTE_WHITELIST, "html")
+    app.add_config_value("smv_released_pattern", DEFAULT_RELEASED_PATTERN, "html")
     app.add_config_value("smv_outputdir_format", DEFAULT_OUTPUTDIR_FORMAT, "html")
     app.connect("config-inited", config_inited)
 

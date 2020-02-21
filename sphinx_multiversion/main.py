@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
+import re
 import json
 import pathlib
 import subprocess
@@ -55,6 +56,7 @@ def main(argv=None):
     tag_whitelist = config.get('smv_tag_whitelist', sphinx.DEFAULT_TAG_WHITELIST)
     branch_whitelist = config.get('smv_branch_whitelist', sphinx.DEFAULT_BRANCH_WHITELIST)
     remote_whitelist = config.get('smv_remote_whitelist', sphinx.DEFAULT_REMOTE_WHITELIST)
+    released_pattern = config.get('smv_released_pattern', sphinx.DEFAULT_RELEASED_PATTERN)
     outputdir_format = config.get('smv_outputdir_format', sphinx.DEFAULT_OUTPUTDIR_FORMAT)
 
     gitroot = pathlib.Path('.').resolve()
@@ -93,6 +95,7 @@ def main(argv=None):
                 "name": versionref.name,
                 "version": versionref.version,
                 "release": versionref.release,
+                "is_released": bool(re.match(released_pattern, versionref.refname)),
                 "source": versionref.source,
                 "sourcedir": srcdir,
                 "outputdir": outputdir,
