@@ -7,7 +7,9 @@ from . import sphinx
 
 VersionRef = collections.namedtuple('VersionRef', [
     'name',
+    'commit',
     'source',
+    'is_remote',
     'refname',
     'version',
     'release',
@@ -15,18 +17,20 @@ VersionRef = collections.namedtuple('VersionRef', [
 
 
 def get_refs(gitroot):
-    cmd = ("git", "for-each-ref", "--format", "%(refname)", "refs")
+    cmd = ("git", "for-each-ref", "--format", "%(objectname) %(refname)", "refs")
     output = subprocess.check_output(cmd, cwd=gitroot).decode()
     for line in output.splitlines():
-        refname = line.strip()
-
+        line = line.strip()
         # Parse refname
-        matchobj = re.match(r"^refs/(heads|tags|remotes/[^/]+)/(\S+)$", refname)
+        matchobj = re.match(r"^(\w+) refs/(heads|tags|remotes/[^/]+)/(\S+)$", line)
         if not matchobj:
             continue
-        source = matchobj.group(1)
-        name = matchobj.group(2)
-        yield (name, source, refname)
+        commit = matchobj.group(1)
+        source = matchobj.group(2)
+        name = matchobj.group(3)
+        refname = line.partition(' ')[2]
+
+        yield (name, commit, source, refname)
 
 
 def get_conf(gitroot, refname, confpath):
@@ -36,14 +40,19 @@ def get_conf(gitroot, refname, confpath):
 
 
 def find_versions(gitroot, confpath, tag_whitelist, branch_whitelist, remote_whitelist):
-    for name, source, refname in get_refs(gitroot):
+    for name, commit, source, refname in get_refs(gitroot):
+        is_remote = False
         if source == 'tags':
             if tag_whitelist is None or not re.match(tag_whitelist, name):
                 continue
         elif source == 'heads':
             if branch_whitelist is None or not re.match(branch_whitelist, name):
                 continue
-        elif remote_whitelist is not None and re.match(remote_whitelist, source):
+        elif source.startswith('remotes/') and remote_whitelist is not None:
+            is_remote = True
+            remote_name = source.partition('/')[2]
+            if not re.match(remote_whitelist, remote_name):
+                continue
             if branch_whitelist is None or not re.match(branch_whitelist, name):
                 continue
         else:
@@ -53,7 +62,7 @@ def find_versions(gitroot, confpath, tag_whitelist, branch_whitelist, remote_whi
         config = sphinx.parse_conf(conf)
         version = config['version']
         release = config['release']
-        yield VersionRef(name, source, refname, version, release)
+        yield VersionRef(name, commit, source, is_remote, refname, version, release)
 
 
 def shallow_clone(src, dst, branch):
