@@ -23,10 +23,11 @@ Version = collections.namedtuple('Version', [
 
 
 class VersionInfo:
-    def __init__(self, app, context, metadata):
+    def __init__(self, app, context, metadata, current_version_name):
         self.app = app
         self.context = context
         self.metadata = metadata
+        self.current_version_name = current_version_name
 
     @property
     def tags(self):
@@ -56,20 +57,30 @@ class VersionInfo:
         for item in self.branches:
             yield item
 
+    def __getitem__(self, name):
+        v = self.metadata.get(name)
+        if v:
+            return Version(
+                name=v["name"],
+                url=self.vpathto(v["name"]),
+                version=v["version"],
+                release=v["release"],
+            )
+
     def vhasdoc(self, other_version_name):
-        if self.context["current_version"] == other_version_name:
+        if self.current_version_name == other_version_name:
             return True
 
         other_version = self.metadata[other_version_name]
         return self.context["pagename"] in other_version["docnames"]
 
     def vpathto(self, other_version_name):
-        if self.context["current_version"] == other_version_name:
+        if self.current_version_name == other_version_name:
             return '{}.html'.format(
                 posixpath.split(self.context["pagename"])[-1])
 
         # Find output root
-        current_version = self.metadata[self.context["current_version"]]
+        current_version = self.metadata[self.current_version_name]
         relpath = pathlib.PurePath(current_version["outputdir"])
         outputroot = os.path.join(
             *('..' for x in relpath.joinpath(self.context["pagename"]).parent.parts)
@@ -97,14 +108,16 @@ def format_outputdir(fmt, versionref, language):
 
 
 def html_page_context(app, pagename, templatename, context, doctree):
-    context["latest_version"] = app.config.smv_latest_version
-    context["current_version"] = app.config.smv_current_version
-    context["html_theme"] = app.config.html_theme
-
-    versioninfo = VersionInfo(app, context, app.config.smv_metadata)
+    versioninfo = VersionInfo(
+        app, context, app.config.smv_metadata, app.config.smv_current_version)
     context["versions"] = versioninfo
     context["vhasdoc"] = versioninfo.vhasdoc
     context["vpathto"] = versioninfo.vpathto
+
+    context["current_version"] = versioninfo[app.config.smv_current_version]
+    context["latest_version"] = versioninfo[app.config.smv_latest_version]
+    context["html_theme"] = app.config.html_theme
+
 
 
 def config_inited(app, config):
