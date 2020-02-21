@@ -29,27 +29,23 @@ class VersionInfo:
         self.metadata = metadata
         self.current_version_name = current_version_name
 
+    def _dict_to_versionobj(self, v):
+        return Version(
+            name=v["name"],
+            url=self.vpathto(v["name"]),
+            version=v["version"],
+            release=v["release"],
+        )
+
     @property
     def tags(self):
-        return [
-            Version(
-                name=v["name"],
-                url=self.vpathto(v["name"]),
-                version=v["version"],
-                release=v["release"],
-            ) for v in self.metadata.values() if v["source"] == "tags"
-        ]
+        return [self._dict_to_versionobj(v) for v in self.metadata.values()
+                if v["source"] == "tags"]
 
     @property
     def branches(self):
-        return [
-            Version(
-                name=v["name"],
-                url=self.vpathto(v["name"]),
-                version=v["version"],
-                release=v["release"],
-            ) for v in self.metadata.values() if v["source"] != "tags"
-        ]
+        return [self._dict_to_versionobj(v) for v in self.metadata.values()
+                if v["source"] != "tags"]
 
     def __iter__(self):
         for item in self.tags:
@@ -60,12 +56,7 @@ class VersionInfo:
     def __getitem__(self, name):
         v = self.metadata.get(name)
         if v:
-            return Version(
-                name=v["name"],
-                url=self.vpathto(v["name"]),
-                version=v["version"],
-                release=v["release"],
-            )
+            return self._dict_to_versionobj(v)
 
     def vhasdoc(self, other_version_name):
         if self.current_version_name == other_version_name:
