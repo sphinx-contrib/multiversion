@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 import collections
+import tempfile
 import subprocess
 import re
+import tarfile
 
 from . import sphinx
 
@@ -65,7 +67,10 @@ def find_versions(gitroot, confpath, tag_whitelist, branch_whitelist, remote_whi
         yield VersionRef(name, commit, source, is_remote, refname, version, release)
 
 
-def shallow_clone(src, dst, branch):
-    cmd = ("git", "clone", "--no-hardlinks", "--single-branch", "--depth", "1",
-           "--branch", branch, src, dst)
-    subprocess.check_call(cmd)
+def copy_tree(src, dst, reference, sourcepath='.'):
+    with tempfile.SpooledTemporaryFile() as fp:
+        cmd = ("git", "archive", "--format", "tar", reference.commit, "--", sourcepath)
+        subprocess.check_call(cmd, stdout=fp)
+        fp.seek(0)
+        with tarfile.TarFile(fileobj=fp) as tarfp:
+            tarfp.extractall(dst)

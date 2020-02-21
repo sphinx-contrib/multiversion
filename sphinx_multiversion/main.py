@@ -81,8 +81,8 @@ def main(argv=None):
             repopath = os.path.join(tmp, str(hash(versionref)))
             srcdir = os.path.join(repopath, sourcedir)
             try:
-                git.shallow_clone(gitroot.as_uri(), repopath, versionref.name)
-            except subprocess.CalledProcessError:
+                git.copy_tree(gitroot.as_uri(), repopath, versionref)
+            except (OSError, subprocess.CalledProcessError):
                 outputdirs.remove(outputdir)
                 continue
 
