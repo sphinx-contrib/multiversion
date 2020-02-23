@@ -11,8 +11,9 @@ setup(
       ],
     author='Jan Holthuis',
     author_email='holthuis.jan@googlemail.com',
+    version="1.0.0",
     install_requires=['sphinx >= 2.1'],
-    license='MIT',
+    license='BSD',
     packages=['sphinx_multiversion'],
     entry_points={
         'console_scripts': [
