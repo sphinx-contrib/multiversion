@@ -13,7 +13,7 @@ DEFAULT_TAG_WHITELIST = r'^.*$'
 DEFAULT_BRANCH_WHITELIST = r'^.*$'
 DEFAULT_REMOTE_WHITELIST = None
 DEFAULT_RELEASED_PATTERN = r'^tags/.*$'
-DEFAULT_OUTPUTDIR_FORMAT = r'{version.version}/{language}'
+DEFAULT_OUTPUTDIR_FORMAT = r'{config.version}/{config.language}'
 
 Version = collections.namedtuple('Version', [
     'name',
@@ -105,10 +105,6 @@ def parse_conf(config):
     code = importlib.abc.InspectLoader.source_to_code(config)
     exec(code, module)
     return module
-
-
-def format_outputdir(fmt, versionref, language):
-    return fmt.format(version=versionref, language=language)
 
 
 def html_page_context(app, pagename, templatename, context, doctree):

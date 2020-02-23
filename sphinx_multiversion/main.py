@@ -1,13 +1,16 @@
 # -*- coding: utf-8 -*-
-import os
-import re
+import argparse
 import json
+import logging
+import os
 import pathlib
+import re
 import subprocess
 import sys
 import tempfile
 
 from sphinx.cmd import build as sphinx_build
+from sphinx import config as sphinx_config
 from sphinx import project as sphinx_project
 
 from . import sphinx
@@ -18,89 +21,115 @@ def main(argv=None):
     if not argv:
         argv = sys.argv[1:]
 
-    parser = sphinx_build.get_parser()
-    args = parser.parse_args(argv)
+    parser = argparse.ArgumentParser()
+    parser.add_argument('sourcedir', help='path to documentation source files')
+    parser.add_argument('outputdir', help='path to output directory')
+    parser.add_argument('filenames', nargs='*', help='a list of specific files to rebuild. Ignored if -a is specified')
+    parser.add_argument('-c', metavar='PATH', dest='confdir', help='path where configuration file (conf.py) is located (default: same as SOURCEDIR)')
+    parser.add_argument('-C', action='store_true', dest='noconfig', help='use no config file at all, only -D options')
+    parser.add_argument('-D', metavar='setting=value', action='append', dest='define', default=[], help='override a setting in configuration file')
+    parser.add_argument('--dump-metadata', action='store_true', help='dump generated metadata and exit')
+    args, argv = parser.parse_known_args(argv)
+    if args.noconfig:
+        return 1
 
-    # Find the indices
-    srcdir_index = None
-    outdir_index = None
-    for i, value in enumerate(argv):
-        if value == args.sourcedir:
-            argv[i] = '{{{SOURCEDIR}}}'
-            test_args = parser.parse_args(argv)
-            if test_args.sourcedir == argv[i]:
-                srcdir_index = i
-            argv[i] = args.sourcedir
-
-        if value == args.outputdir:
-            argv[i] = '{{{OUTPUTDIR}}}'
-            test_args = parser.parse_args(argv)
-            if test_args.outputdir == argv[i]:
-                outdir_index = i
-            argv[i] = args.outputdir
-
-    if srcdir_index is None:
-        raise ValueError("Failed to find srcdir index")
-    if outdir_index is None:
-        raise ValueError("Failed to find outdir index")
-
-    # Parse config
-    confpath = os.path.join(args.confdir, 'conf.py')
-    with open(confpath, mode='r') as f:
-        config = sphinx.parse_conf(f.read())
-
+    # Conf-overrides
+    confoverrides = {}
     for d in args.define:
         key, _, value = d.partition('=')
-        config[key] = value
+        confoverrides[key] = value
 
-    tag_whitelist = config.get('smv_tag_whitelist', sphinx.DEFAULT_TAG_WHITELIST)
-    branch_whitelist = config.get('smv_branch_whitelist', sphinx.DEFAULT_BRANCH_WHITELIST)
-    remote_whitelist = config.get('smv_remote_whitelist', sphinx.DEFAULT_REMOTE_WHITELIST)
-    released_pattern = config.get('smv_released_pattern', sphinx.DEFAULT_RELEASED_PATTERN)
-    outputdir_format = config.get('smv_outputdir_format', sphinx.DEFAULT_OUTPUTDIR_FORMAT)
+    # Parse config
+    config = sphinx_config.Config.read(
+        os.path.abspath(args.confdir if args.confdir else args.sourcedir),
+        confoverrides,
+    )
+    config.add("smv_tag_whitelist", sphinx.DEFAULT_TAG_WHITELIST, "html", str)
+    config.add("smv_branch_whitelist", sphinx.DEFAULT_TAG_WHITELIST, "html", str)
+    config.add("smv_remote_whitelist", sphinx.DEFAULT_REMOTE_WHITELIST, "html", str)
+    config.add("smv_released_pattern", sphinx.DEFAULT_RELEASED_PATTERN, "html", str)
+    config.add("smv_outputdir_format", sphinx.DEFAULT_OUTPUTDIR_FORMAT, "html", str)
 
+    # Get git references
     gitroot = pathlib.Path('.').resolve()
-    versions = git.find_versions(str(gitroot), 'source/conf.py', tag_whitelist, branch_whitelist, remote_whitelist)
+    gitrefs = git.get_refs(
+        str(gitroot),
+        config.smv_tag_whitelist,
+        config.smv_branch_whitelist,
+        config.smv_remote_whitelist,
+    )
+
+    logger = logging.getLogger(__name__)
+
+    # Get Sourcedir
+    sourcedir = os.path.relpath(args.sourcedir, str(gitroot))
+    if args.confdir:
+        confdir = os.path.relpath(args.confdir, str(gitroot))
+    else:
+        confdir = sourcedir
 
     with tempfile.TemporaryDirectory() as tmp:
         # Generate Metadata
         metadata = {}
         outputdirs = set()
-        sourcedir = os.path.relpath(args.sourcedir, str(gitroot))
-        for versionref in versions:
+        for gitref in gitrefs:
+            # Clone Git repo
+            repopath = os.path.join(tmp, gitref.commit)
+            try:
+                git.copy_tree(gitroot.as_uri(), repopath, gitref)
+            except (OSError, subprocess.CalledProcessError):
+                logger.error(
+                    "Failed to copy git tree for %s to %s",
+                    gitref.refname, repopath)
+                continue
+
+            # Find config
+            confpath = os.path.join(repopath, confdir)
+            try:
+                current_config = sphinx_config.Config.read(
+                    confpath,
+                    confoverrides,
+                )
+            except sphinx_config.ConfigError:
+                logger.error(
+                    "Failed load config for %s from %s",
+                    gitref.refname, confpath)
+                continue
+
             # Ensure that there are not duplicate output dirs
-            outputdir = sphinx.format_outputdir(
-                outputdir_format, versionref, language=config["language"])
+            outputdir = config.smv_outputdir_format.format(
+                ref=gitref,
+                config=current_config,
+            )
             if outputdir in outputdirs:
-                print("outputdir '%s' of version %r conflicts with other versions!"
-                      % (outputdir, versionref))
+                logger.warning(
+                    "outputdir '%s' for %s conflicts with other versions",
+                    outputdir, gitref.name)
                 continue
             outputdirs.add(outputdir)
 
-            # Clone Git repo
-            repopath = os.path.join(tmp, str(hash(versionref)))
-            srcdir = os.path.join(repopath, sourcedir)
-            try:
-                git.copy_tree(gitroot.as_uri(), repopath, versionref)
-            except (OSError, subprocess.CalledProcessError):
-                outputdirs.remove(outputdir)
-                continue
-
             # Get List of files
-            source_suffixes = config.get("source_suffix", "")
+            source_suffixes = current_config.source_suffix
             if isinstance(source_suffixes, str):
-                source_suffixes = [source_suffixes]
-            project = sphinx_project.Project(srcdir, source_suffixes)
-            metadata[versionref.name] = {
-                "name": versionref.name,
-                "version": versionref.version,
-                "release": versionref.release,
-                "is_released": bool(re.match(released_pattern, versionref.refname)),
-                "source": versionref.source,
-                "sourcedir": srcdir,
+                source_suffixes = [current_config.source_suffix]
+            project = sphinx_project.Project(sourcedir, source_suffixes)
+            metadata[gitref.name] = {
+                "name": gitref.name,
+                "version": current_config.version,
+                "release": current_config.release,
+                "is_released": bool(
+                    re.match(config.smv_released_pattern, gitref.refname)),
+                "source": gitref.source,
+                "sourcedir": sourcedir,
                 "outputdir": outputdir,
                 "docnames": list(project.discover())
             }
+
+        if args.dump_metadata:
+            print(json.dumps(metadata, indent=2))
+            return
+
+        # Write Metadata
         metadata_path = os.path.abspath(os.path.join(tmp, "versions.json"))
         with open(metadata_path, mode='w') as fp:
             json.dump(metadata, fp, indent=2)
@@ -108,15 +137,18 @@ def main(argv=None):
         # Run Sphinx
         argv.extend(["-D", "smv_metadata_path={}".format(metadata_path)])
         for version_name, data in metadata.items():
+            outdir = os.path.join(args.outputdir, data["outputdir"])
+            os.makedirs(outdir, exist_ok=True)
+
             current_argv = argv.copy()
             current_argv.extend([
+                *args.define,
                 "-D", "smv_current_version={}".format(version_name),
+                "-c", args.confdir,
+                data["sourcedir"],
+                outdir,
+                *args.filenames,
             ])
-
-            outdir = os.path.join(args.outputdir, data["outputdir"])
-            current_argv[srcdir_index] = data["sourcedir"]
-            current_argv[outdir_index] = outdir
-            os.makedirs(outdir, exist_ok=True)
             status = sphinx_build.build_main(current_argv)
             if status not in (0, None):
                 break

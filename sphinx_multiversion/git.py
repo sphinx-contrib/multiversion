@@ -5,23 +5,20 @@ import subprocess
 import re
 import tarfile
 
-from . import sphinx
-
-VersionRef = collections.namedtuple('VersionRef', [
+GitRef = collections.namedtuple('VersionRef', [
     'name',
     'commit',
     'source',
     'is_remote',
     'refname',
-    'version',
-    'release',
 ])
 
 
-def get_refs(gitroot):
+def get_all_refs(gitroot):
     cmd = ("git", "for-each-ref", "--format", "%(objectname) %(refname)", "refs")
     output = subprocess.check_output(cmd, cwd=gitroot).decode()
     for line in output.splitlines():
+        is_remote = False
         line = line.strip()
         # Parse refname
         matchobj = re.match(r"^(\w+) refs/(heads|tags|remotes/[^/]+)/(\S+)$", line)
@@ -31,40 +28,30 @@ def get_refs(gitroot):
         source = matchobj.group(2)
         name = matchobj.group(3)
         refname = line.partition(' ')[2]
-
-        yield (name, commit, source, refname)
-
-
-def get_conf(gitroot, refname, confpath):
-    objectname = "{}:{}".format(refname, confpath)
-    cmd = ("git", "show", objectname)
-    return subprocess.check_output(cmd, cwd=gitroot).decode()
-
-
-def find_versions(gitroot, confpath, tag_whitelist, branch_whitelist, remote_whitelist):
-    for name, commit, source, refname in get_refs(gitroot):
-        is_remote = False
-        if source == 'tags':
-            if tag_whitelist is None or not re.match(tag_whitelist, name):
-                continue
-        elif source == 'heads':
-            if branch_whitelist is None or not re.match(branch_whitelist, name):
-                continue
-        elif source.startswith('remotes/') and remote_whitelist is not None:
+        if source.startswith('remotes/'):
             is_remote = True
-            remote_name = source.partition('/')[2]
+
+        yield GitRef(name, commit, source, is_remote, refname)
+
+
+def get_refs(gitroot, tag_whitelist, branch_whitelist, remote_whitelist):
+    for ref in get_all_refs(gitroot):
+        if ref.source == 'tags':
+            if tag_whitelist is None or not re.match(tag_whitelist, ref.name):
+                continue
+        elif ref.source == 'heads':
+            if branch_whitelist is None or not re.match(branch_whitelist, ref.name):
+                continue
+        elif ref.is_remote and remote_whitelist is not None:
+            remote_name = ref.source.partition('/')[2]
             if not re.match(remote_whitelist, remote_name):
                 continue
-            if branch_whitelist is None or not re.match(branch_whitelist, name):
+            if branch_whitelist is None or not re.match(branch_whitelist, ref.name):
                 continue
         else:
             continue
 
-        conf = get_conf(gitroot, refname, confpath)
-        config = sphinx.parse_conf(conf)
-        version = config['version']
-        release = config['release']
-        yield VersionRef(name, commit, source, is_remote, refname, version, release)
+        yield ref
 
 
 def copy_tree(src, dst, reference, sourcepath='.'):
