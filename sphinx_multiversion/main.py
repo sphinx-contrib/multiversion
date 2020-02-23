@@ -49,6 +49,8 @@ def main(argv=None):
     config.add("smv_remote_whitelist", sphinx.DEFAULT_REMOTE_WHITELIST, "html", str)
     config.add("smv_released_pattern", sphinx.DEFAULT_RELEASED_PATTERN, "html", str)
     config.add("smv_outputdir_format", sphinx.DEFAULT_OUTPUTDIR_FORMAT, "html", str)
+    config.pre_init_values()
+    config.init_values()
 
     # Get git references
     gitroot = pathlib.Path('.').resolve()
@@ -95,6 +97,8 @@ def main(argv=None):
                     "Failed load config for %s from %s",
                     gitref.refname, confpath)
                 continue
+            current_config.pre_init_values()
+            current_config.init_values()
 
             # Ensure that there are not duplicate output dirs
             outputdir = config.smv_outputdir_format.format(

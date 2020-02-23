@@ -13,7 +13,7 @@ DEFAULT_TAG_WHITELIST = r'^.*$'
 DEFAULT_BRANCH_WHITELIST = r'^.*$'
 DEFAULT_REMOTE_WHITELIST = None
 DEFAULT_RELEASED_PATTERN = r'^tags/.*$'
-DEFAULT_OUTPUTDIR_FORMAT = r'{config.version}/{config.language}'
+DEFAULT_OUTPUTDIR_FORMAT = r'{ref.name}'
 
 Version = collections.namedtuple('Version', [
     'name',
