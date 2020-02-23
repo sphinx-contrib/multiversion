@@ -92,7 +92,7 @@ def main(argv=None):
                     confpath,
                     confoverrides,
                 )
-            except sphinx_config.ConfigError:
+            except (OSError, sphinx_config.ConfigError):
                 logger.error(
                     "Failed load config for %s from %s",
                     gitref.refname, confpath)
