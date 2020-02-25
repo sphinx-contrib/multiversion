@@ -116,7 +116,9 @@ def main(argv=None):
             source_suffixes = current_config.source_suffix
             if isinstance(source_suffixes, str):
                 source_suffixes = [current_config.source_suffix]
-            project = sphinx_project.Project(sourcedir, source_suffixes)
+
+            current_sourcedir = os.path.join(repopath, sourcedir)
+            project = sphinx_project.Project(current_sourcedir, source_suffixes)
             metadata[gitref.name] = {
                 "name": gitref.name,
                 "version": current_config.version,
@@ -124,7 +126,7 @@ def main(argv=None):
                 "is_released": bool(
                     re.match(config.smv_released_pattern, gitref.refname)),
                 "source": gitref.source,
-                "sourcedir": sourcedir,
+                "sourcedir": current_sourcedir,
                 "outputdir": outputdir,
                 "docnames": list(project.discover())
             }
