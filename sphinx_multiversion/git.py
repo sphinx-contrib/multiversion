@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import collections
+import datetime
 import tempfile
 import subprocess
 import re
@@ -11,27 +12,35 @@ GitRef = collections.namedtuple('VersionRef', [
     'source',
     'is_remote',
     'refname',
+    'creatordate',
 ])
 
 
 def get_all_refs(gitroot):
-    cmd = ("git", "for-each-ref", "--format", "%(objectname) %(refname)", "refs")
+    cmd = ("git", "for-each-ref", "--format",
+           "%(objectname)\t%(refname)\t%(creatordate:iso-strict)", "refs")
     output = subprocess.check_output(cmd, cwd=gitroot).decode()
     for line in output.splitlines():
         is_remote = False
-        line = line.strip()
+        fields = line.strip().split("\t")
+        if len(fields) != 3:
+            continue
+
+        commit = fields[0]
+        refname = fields[1]
+        creatordate = datetime.datetime.fromisoformat(fields[2])
+
         # Parse refname
-        matchobj = re.match(r"^(\w+) refs/(heads|tags|remotes/[^/]+)/(\S+)$", line)
+        matchobj = re.match(r"^refs/(heads|tags|remotes/[^/]+)/(\S+)$", refname)
         if not matchobj:
             continue
-        commit = matchobj.group(1)
-        source = matchobj.group(2)
-        name = matchobj.group(3)
-        refname = line.partition(' ')[2]
+        source = matchobj.group(1)
+        name = matchobj.group(2)
+
         if source.startswith('remotes/'):
             is_remote = True
 
-        yield GitRef(name, commit, source, is_remote, refname)
+        yield GitRef(name, commit, source, is_remote, refname, creatordate)
 
 
 def get_refs(gitroot, tag_whitelist, branch_whitelist, remote_whitelist):

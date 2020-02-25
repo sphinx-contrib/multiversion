@@ -127,6 +127,7 @@ def main(argv=None):
                 "is_released": bool(
                     re.match(config.smv_released_pattern, gitref.refname)),
                 "source": gitref.source,
+                "creatordate": gitref.creatordate.isoformat(),
                 "sourcedir": current_sourcedir,
                 "outputdir": outputdir,
                 "docnames": list(project.discover())

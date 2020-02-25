@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import datetime
 import json
 import pathlib
 import collections
@@ -7,6 +8,8 @@ import os
 import posixpath
 
 from sphinx import config as sphinx_config
+from sphinx.util import i18n as sphinx_i18n
+from sphinx.locale import _
 
 logger = logging.getLogger(__name__)
 
@@ -131,6 +134,11 @@ def config_inited(app, config):
     if not config.smv_current_version:
         return
 
+    try:
+        data = app.config.smv_metadata[config.smv_current_version]
+    except KeyError:
+        return
+
     app.connect("html-page-context", html_page_context)
 
     # Restore config values
@@ -139,6 +147,12 @@ def config_inited(app, config):
     old_config.init_values()
     config.version = old_config.version
     config.release = old_config.release
+    config.today = old_config.today
+    if not config.today:
+        config.today = sphinx_i18n.format_date(
+            format=config.today_fmt or _('%b %d, %Y'),
+            date=datetime.datetime.fromisoformat(data["creatordate"]),
+            language=config.language)
 
 
 def setup(app):
