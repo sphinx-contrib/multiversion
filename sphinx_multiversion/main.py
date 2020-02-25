@@ -137,6 +137,10 @@ def main(argv=None):
             print(json.dumps(metadata, indent=2))
             return
 
+        if not metadata:
+            logger.error("No matching refs found!")
+            return
+
         # Write Metadata
         metadata_path = os.path.abspath(os.path.join(tmp, "versions.json"))
         with open(metadata_path, mode='w') as fp:
