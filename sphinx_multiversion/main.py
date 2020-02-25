@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import itertools
 import argparse
 import json
 import logging
@@ -148,7 +149,7 @@ def main(argv=None):
 
             current_argv = argv.copy()
             current_argv.extend([
-                *args.define,
+                *itertools.chain(*(('-D', d) for d in args.define)),
                 "-D", "smv_current_version={}".format(version_name),
                 "-c", args.confdir,
                 data["sourcedir"],
