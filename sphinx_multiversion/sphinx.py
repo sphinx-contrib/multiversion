@@ -2,10 +2,11 @@
 import json
 import pathlib
 import collections
-import importlib.abc
 import logging
 import os
 import posixpath
+
+from sphinx import config as sphinx_config
 
 logger = logging.getLogger(__name__)
 
@@ -100,13 +101,6 @@ class VersionInfo:
         return posixpath.join(outputdir, '{}.html'.format(self.context["pagename"]))
 
 
-def parse_conf(config):
-    module = {}
-    code = importlib.abc.InspectLoader.source_to_code(config)
-    exec(code, module)
-    return module
-
-
 def html_page_context(app, pagename, templatename, context, doctree):
     versioninfo = VersionInfo(
         app, context, app.config.smv_metadata, app.config.smv_current_version)
@@ -140,11 +134,11 @@ def config_inited(app, config):
     app.connect("html-page-context", html_page_context)
 
     # Restore config values
-    conf_path = os.path.join(app.srcdir, "conf.py")
-    with open(conf_path, mode="r") as f:
-        conf = parse_conf(f.read())
-        config.version = conf['version']
-        config.release = conf['release']
+    old_config = sphinx_config.Config.read(app.srcdir)
+    old_config.pre_init_values()
+    old_config.init_values()
+    config.version = old_config.version
+    config.release = old_config.release
 
 
 def setup(app):
