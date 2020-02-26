@@ -18,7 +18,7 @@ GitRef = collections.namedtuple('VersionRef', [
 
 def get_all_refs(gitroot):
     cmd = ("git", "for-each-ref", "--format",
-           "%(objectname)\t%(refname)\t%(creatordate:iso-strict)", "refs")
+           "%(objectname)\t%(refname)\t%(creatordate:iso)", "refs")
     output = subprocess.check_output(cmd, cwd=gitroot).decode()
     for line in output.splitlines():
         is_remote = False
@@ -28,7 +28,7 @@ def get_all_refs(gitroot):
 
         commit = fields[0]
         refname = fields[1]
-        creatordate = datetime.datetime.fromisoformat(fields[2])
+        creatordate = datetime.datetime.strptime(fields[2], "%Y-%m-%d %H:%M:%S %z")
 
         # Parse refname
         matchobj = re.match(r"^refs/(heads|tags|remotes/[^/]+)/(\S+)$", refname)
