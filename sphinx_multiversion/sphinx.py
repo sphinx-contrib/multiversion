@@ -151,7 +151,7 @@ def config_inited(app, config):
     if not config.today:
         config.today = sphinx_i18n.format_date(
             format=config.today_fmt or _('%b %d, %Y'),
-            date=datetime.datetime.strftime(data["creatordate"], "%Y-%m-%d %H:%M:%S %z"),
+            date=datetime.datetime.strptime(data["creatordate"], "%Y-%m-%d %H:%M:%S %z"),
             language=config.language)
 
 
