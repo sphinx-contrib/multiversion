@@ -63,3 +63,4 @@ deploy:
     branch: master
     repo: Holzhaus/sphinx-multiversion
     tags: true
+    python: 3.7
