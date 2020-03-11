@@ -15,3 +15,19 @@ templates_path = ["_templates"]
 extensions = [
     "sphinx_multiversion",
 ]
+
+templates_path = [
+    "_templates",
+]
+
+html_sidebars = {
+    "**": [
+        "about.html",
+        "navigation.html",
+        "relations.html",
+        "searchbox.html",
+        "versioning.html",
+    ],
+}
+
+mv_remote_whitelist = r"^origin$"
