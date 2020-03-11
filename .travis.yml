@@ -14,7 +14,7 @@ before_script:
 - pre-commit run --all-files
 script:
 - mkdir html
-- sphinx-multiversion docs html
+- sphinx-multiversion -W docs html
 - python setup.py build sdist bdist_wheel
 
 # Deployment
