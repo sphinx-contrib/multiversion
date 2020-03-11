@@ -116,7 +116,7 @@ def main(argv=None):
             if outputdir in outputdirs:
                 logger.warning(
                     "outputdir '%s' for %s conflicts with other versions",
-                    outputdir, gitref.name)
+                    outputdir, gitref.refname)
                 continue
             outputdirs.add(outputdir)
 
