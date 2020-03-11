@@ -23,4 +23,5 @@ Project Links
     :maxdepth: 1
     :caption: Appendix
 
+    faq
     changelog
