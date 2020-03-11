@@ -12,4 +12,6 @@ html_last_updated_fmt = "%c"
 master_doc = "index"
 pygments_style = "friendly"
 templates_path = ["_templates"]
-extensions = []
+extensions = [
+    "sphinx_multiversion",
+]
