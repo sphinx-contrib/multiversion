@@ -50,6 +50,7 @@ def main(argv=None):
     config.add("smv_remote_whitelist", sphinx.DEFAULT_REMOTE_WHITELIST, "html", str)
     config.add("smv_released_pattern", sphinx.DEFAULT_RELEASED_PATTERN, "html", str)
     config.add("smv_outputdir_format", sphinx.DEFAULT_OUTPUTDIR_FORMAT, "html", str)
+    config.add("smv_prefer_remote_refs", False, "html", bool)
     config.pre_init_values()
     config.init_values()
 
@@ -61,6 +62,12 @@ def main(argv=None):
         config.smv_branch_whitelist,
         config.smv_remote_whitelist,
     )
+
+    # Order git refs
+    if config.smv_prefer_remote_refs:
+        gitrefs = sorted(gitrefs, key=lambda x: (not x.is_remote, *x))
+    else:
+        gitrefs = sorted(gitrefs, key=lambda x: (x.is_remote, *x))
 
     logger = logging.getLogger(__name__)
 
