@@ -6,14 +6,20 @@ Installation
 
 You can install ``sphinx-multiversion`` via `pip <pip_>`_ or directly from :file:`setup.py`.
 
-.. note::
-   Since ``sphinx-multiversion`` is still under heavy development, it is not available on `PyPI <pypi_>`_ yet.
+Install from PyPi
+===================
+
+Using pip you can easily install the latest release version `PyPI <pypi_>`_:
+
+.. code-block:: bash
+
+    pip install sphinx-multiversion
 
 Install from GitHub
 ===================
 
-You can install the latest development version using pip to install directly from the GitHub
-repository.
+You can install the latest development version using pip directly from the GitHub
+repository:
 
 .. code-block:: bash
 
