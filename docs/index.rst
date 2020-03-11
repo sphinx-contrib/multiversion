@@ -23,5 +23,6 @@ Project Links
     :maxdepth: 1
     :caption: Appendix
 
+    github_pages
     faq
     changelog
