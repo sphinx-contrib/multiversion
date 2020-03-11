@@ -18,6 +18,9 @@ script:
 - python setup.py build sdist bdist_wheel
 
 # Deployment
+before_deploy:
+  - touch html/.nojekyll
+  - cp assets/gh-pages-redirect.html html/index.html
 deploy:
   # Deploy documentation
 - provider: pages
