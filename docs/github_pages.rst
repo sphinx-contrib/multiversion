@@ -55,5 +55,35 @@ Just add a :file:`index.html` file to the root directory of your ``gh-pages`` br
       </head>
     </html>
 
+Automating documentation builds with Travis CI
+==============================================
+
+You can also automate versioned builds using Travis CI.
+To do that, add this to your :file:`.travis.yml` file:
+
+.. code-block:: yaml
+
+    script:
+      # Build documentation
+    - mkdir html
+    - sphinx-multiversion docs/ html/
+
+    before_deploy:
+      # Add .nojekyll file and redirect from docroot to the sphinx output dir
+    - touch html/.nojekyll
+    - cp assets/gh-pages-redirect.html html/index.html
+
+    deploy:
+      # Only deploy the sphinx output dir as gh-pages branch
+    - provider: pages
+      skip_cleanup: true
+      github_token: $GITHUB_TOKEN
+      keep_history: false
+      local_dir: html
+
+.. seealso::
+
+    For details, please have a look at the `GitHub Pages Deployment documentation for Travis CI <travis_gh_pages_deployment_>`_.
 
 .. _github_pages_website: https://pages.github.com/
+.. _travis_gh_pages_deployment: https://docs.travis-ci.com/user/deployment/pages/
