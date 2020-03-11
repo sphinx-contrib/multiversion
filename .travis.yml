@@ -1,0 +1,19 @@
+language: python
+python:
+- 3.5
+- 3.6
+- 3.7
+cache:
+  pip: true
+
+install:
+- python -m pip install flake8 setuptools wheel
+- python -m pip install -r requirements.txt
+- python setup.py install
+
+before_script:
+- flake8 --statistics .
+script:
+- mkdir html
+- sphinx-multiversion docs html
+- python setup.py build sdist bdist_wheel
