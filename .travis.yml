@@ -16,3 +16,15 @@ script:
 - mkdir html
 - sphinx-multiversion docs html
 - python setup.py build sdist bdist_wheel
+
+# Deployment
+deploy:
+  # Deploy documentation
+- provider: pages
+  skip_cleanup: true
+  keep_history: true
+  github_token: $GITHUB_TOKEN
+  local_dir: html
+  on:
+    branch: master
+    repo: Holzhaus/sphinx-multiversion
