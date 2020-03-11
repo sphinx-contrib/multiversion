@@ -23,13 +23,41 @@ def main(argv=None):
         argv = sys.argv[1:]
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('sourcedir', help='path to documentation source files')
-    parser.add_argument('outputdir', help='path to output directory')
-    parser.add_argument('filenames', nargs='*', help='a list of specific files to rebuild. Ignored if -a is specified')
-    parser.add_argument('-c', metavar='PATH', dest='confdir', help='path where configuration file (conf.py) is located (default: same as SOURCEDIR)')
-    parser.add_argument('-C', action='store_true', dest='noconfig', help='use no config file at all, only -D options')
-    parser.add_argument('-D', metavar='setting=value', action='append', dest='define', default=[], help='override a setting in configuration file')
-    parser.add_argument('--dump-metadata', action='store_true', help='dump generated metadata and exit')
+    parser.add_argument("sourcedir", help="path to documentation source files")
+    parser.add_argument("outputdir", help="path to output directory")
+    parser.add_argument(
+        "filenames",
+        nargs="*",
+        help="a list of specific files to rebuild. Ignored if -a is specified",
+    )
+    parser.add_argument(
+        "-c",
+        metavar="PATH",
+        dest="confdir",
+        help=(
+            "path where configuration file (conf.py) is located "
+            "(default: same as SOURCEDIR)"
+        ),
+    )
+    parser.add_argument(
+        "-C",
+        action="store_true",
+        dest="noconfig",
+        help="use no config file at all, only -D options",
+    )
+    parser.add_argument(
+        "-D",
+        metavar="setting=value",
+        action="append",
+        dest="define",
+        default=[],
+        help="override a setting in configuration file",
+    )
+    parser.add_argument(
+        "--dump-metadata",
+        action="store_true",
+        help="dump generated metadata and exit",
+    )
     args, argv = parser.parse_known_args(argv)
     if args.noconfig:
         return 1
@@ -37,7 +65,7 @@ def main(argv=None):
     # Conf-overrides
     confoverrides = {}
     for d in args.define:
-        key, _, value = d.partition('=')
+        key, _, value = d.partition("=")
         confoverrides[key] = value
 
     # Parse config
@@ -46,16 +74,24 @@ def main(argv=None):
         confoverrides,
     )
     config.add("smv_tag_whitelist", sphinx.DEFAULT_TAG_WHITELIST, "html", str)
-    config.add("smv_branch_whitelist", sphinx.DEFAULT_TAG_WHITELIST, "html", str)
-    config.add("smv_remote_whitelist", sphinx.DEFAULT_REMOTE_WHITELIST, "html", str)
-    config.add("smv_released_pattern", sphinx.DEFAULT_RELEASED_PATTERN, "html", str)
-    config.add("smv_outputdir_format", sphinx.DEFAULT_OUTPUTDIR_FORMAT, "html", str)
+    config.add(
+        "smv_branch_whitelist", sphinx.DEFAULT_TAG_WHITELIST, "html", str
+    )
+    config.add(
+        "smv_remote_whitelist", sphinx.DEFAULT_REMOTE_WHITELIST, "html", str
+    )
+    config.add(
+        "smv_released_pattern", sphinx.DEFAULT_RELEASED_PATTERN, "html", str
+    )
+    config.add(
+        "smv_outputdir_format", sphinx.DEFAULT_OUTPUTDIR_FORMAT, "html", str
+    )
     config.add("smv_prefer_remote_refs", False, "html", bool)
     config.pre_init_values()
     config.init_values()
 
     # Get git references
-    gitroot = pathlib.Path('.').resolve()
+    gitroot = pathlib.Path(".").resolve()
     gitrefs = git.get_refs(
         str(gitroot),
         config.smv_tag_whitelist,
@@ -90,33 +126,37 @@ def main(argv=None):
             except (OSError, subprocess.CalledProcessError):
                 logger.error(
                     "Failed to copy git tree for %s to %s",
-                    gitref.refname, repopath)
+                    gitref.refname,
+                    repopath,
+                )
                 continue
 
             # Find config
             confpath = os.path.join(repopath, confdir)
             try:
                 current_config = sphinx_config.Config.read(
-                    confpath,
-                    confoverrides,
+                    confpath, confoverrides,
                 )
             except (OSError, sphinx_config.ConfigError):
                 logger.error(
                     "Failed load config for %s from %s",
-                    gitref.refname, confpath)
+                    gitref.refname,
+                    confpath,
+                )
                 continue
             current_config.pre_init_values()
             current_config.init_values()
 
             # Ensure that there are not duplicate output dirs
             outputdir = config.smv_outputdir_format.format(
-                ref=gitref,
-                config=current_config,
+                ref=gitref, config=current_config,
             )
             if outputdir in outputdirs:
                 logger.warning(
                     "outputdir '%s' for %s conflicts with other versions",
-                    outputdir, gitref.refname)
+                    outputdir,
+                    gitref.refname,
+                )
                 continue
             outputdirs.add(outputdir)
 
@@ -126,18 +166,21 @@ def main(argv=None):
                 source_suffixes = [current_config.source_suffix]
 
             current_sourcedir = os.path.join(repopath, sourcedir)
-            project = sphinx_project.Project(current_sourcedir, source_suffixes)
+            project = sphinx_project.Project(
+                current_sourcedir, source_suffixes
+            )
             metadata[gitref.name] = {
                 "name": gitref.name,
                 "version": current_config.version,
                 "release": current_config.release,
                 "is_released": bool(
-                    re.match(config.smv_released_pattern, gitref.refname)),
+                    re.match(config.smv_released_pattern, gitref.refname)
+                ),
                 "source": gitref.source,
-                "creatordate": gitref.creatordate.strftime("%Y-%m-%d %H:%M:%S %z"),
+                "creatordate": gitref.creatordate.strftime(sphinx.DATE_FMT),
                 "sourcedir": current_sourcedir,
                 "outputdir": outputdir,
-                "docnames": list(project.discover())
+                "docnames": list(project.discover()),
             }
 
         if args.dump_metadata:
@@ -150,7 +193,7 @@ def main(argv=None):
 
         # Write Metadata
         metadata_path = os.path.abspath(os.path.join(tmp, "versions.json"))
-        with open(metadata_path, mode='w') as fp:
+        with open(metadata_path, mode="w") as fp:
             json.dump(metadata, fp, indent=2)
 
         # Run Sphinx
@@ -160,14 +203,18 @@ def main(argv=None):
             os.makedirs(outdir, exist_ok=True)
 
             current_argv = argv.copy()
-            current_argv.extend([
-                *itertools.chain(*(('-D', d) for d in args.define)),
-                "-D", "smv_current_version={}".format(version_name),
-                "-c", args.confdir,
-                data["sourcedir"],
-                outdir,
-                *args.filenames,
-            ])
+            current_argv.extend(
+                [
+                    *itertools.chain(*(("-D", d) for d in args.define)),
+                    "-D",
+                    "smv_current_version={}".format(version_name),
+                    "-c",
+                    args.confdir,
+                    data["sourcedir"],
+                    outdir,
+                    *args.filenames,
+                ]
+            )
             status = sphinx_build.build_main(current_argv)
             if status not in (0, None):
                 break

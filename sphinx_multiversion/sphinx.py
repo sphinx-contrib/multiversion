@@ -13,19 +13,16 @@ from sphinx.locale import _
 
 logger = logging.getLogger(__name__)
 
-DEFAULT_TAG_WHITELIST = r'^.*$'
-DEFAULT_BRANCH_WHITELIST = r'^.*$'
+DATE_FMT = "%Y-%m-%d %H:%M:%S %z"
+DEFAULT_TAG_WHITELIST = r"^.*$"
+DEFAULT_BRANCH_WHITELIST = r"^.*$"
 DEFAULT_REMOTE_WHITELIST = None
-DEFAULT_RELEASED_PATTERN = r'^tags/.*$'
-DEFAULT_OUTPUTDIR_FORMAT = r'{ref.name}'
+DEFAULT_RELEASED_PATTERN = r"^tags/.*$"
+DEFAULT_OUTPUTDIR_FORMAT = r"{ref.name}"
 
-Version = collections.namedtuple('Version', [
-    'name',
-    'url',
-    'version',
-    'release',
-    'is_released',
-])
+Version = collections.namedtuple(
+    "Version", ["name", "url", "version", "release", "is_released",]
+)
 
 
 class VersionInfo:
@@ -46,23 +43,35 @@ class VersionInfo:
 
     @property
     def tags(self):
-        return [self._dict_to_versionobj(v) for v in self.metadata.values()
-                if v["source"] == "tags"]
+        return [
+            self._dict_to_versionobj(v)
+            for v in self.metadata.values()
+            if v["source"] == "tags"
+        ]
 
     @property
     def branches(self):
-        return [self._dict_to_versionobj(v) for v in self.metadata.values()
-                if v["source"] != "tags"]
+        return [
+            self._dict_to_versionobj(v)
+            for v in self.metadata.values()
+            if v["source"] != "tags"
+        ]
 
     @property
     def releases(self):
-        return [self._dict_to_versionobj(v) for v in self.metadata.values()
-                if v["is_released"]]
+        return [
+            self._dict_to_versionobj(v)
+            for v in self.metadata.values()
+            if v["is_released"]
+        ]
 
     @property
     def in_development(self):
-        return [self._dict_to_versionobj(v) for v in self.metadata.values()
-                if not v["is_released"]]
+        return [
+            self._dict_to_versionobj(v)
+            for v in self.metadata.values()
+            if not v["is_released"]
+        ]
 
     def __iter__(self):
         for item in self.tags:
@@ -84,29 +93,32 @@ class VersionInfo:
 
     def vpathto(self, other_version_name):
         if self.current_version_name == other_version_name:
-            return '{}.html'.format(
-                posixpath.split(self.context["pagename"])[-1])
+            return "{}.html".format(
+                posixpath.split(self.context["pagename"])[-1]
+            )
 
         # Find output root
         current_version = self.metadata[self.current_version_name]
         relpath = pathlib.PurePath(current_version["outputdir"])
-        outputroot = os.path.join(
-            *('..' for x in relpath.joinpath(self.context["pagename"]).parent.parts)
-        )
+        relpath_dir = relpath.joinpath(self.context["pagename"]).parent
+        outputroot = os.path.join(*(".." for x in relpath_dir.parts))
 
         # Find output dir of other version
         other_version = self.metadata[other_version_name]
         outputdir = posixpath.join(outputroot, other_version["outputdir"])
 
         if not self.vhasdoc(other_version_name):
-            return posixpath.join(outputdir, 'index.html')
+            return posixpath.join(outputdir, "index.html")
 
-        return posixpath.join(outputdir, '{}.html'.format(self.context["pagename"]))
+        return posixpath.join(
+            outputdir, "{}.html".format(self.context["pagename"])
+        )
 
 
 def html_page_context(app, pagename, templatename, context, doctree):
     versioninfo = VersionInfo(
-        app, context, app.config.smv_metadata, app.config.smv_current_version)
+        app, context, app.config.smv_metadata, app.config.smv_current_version
+    )
     context["versions"] = versioninfo
     context["vhasdoc"] = versioninfo.vhasdoc
     context["vpathto"] = versioninfo.vpathto
@@ -114,7 +126,6 @@ def html_page_context(app, pagename, templatename, context, doctree):
     context["current_version"] = versioninfo[app.config.smv_current_version]
     context["latest_version"] = versioninfo[app.config.smv_latest_version]
     context["html_theme"] = app.config.html_theme
-
 
 
 def config_inited(app, config):
@@ -150,9 +161,10 @@ def config_inited(app, config):
     config.today = old_config.today
     if not config.today:
         config.today = sphinx_i18n.format_date(
-            format=config.today_fmt or _('%b %d, %Y'),
-            date=datetime.datetime.strptime(data["creatordate"], "%Y-%m-%d %H:%M:%S %z"),
-            language=config.language)
+            format=config.today_fmt or _("%b %d, %Y"),
+            date=datetime.datetime.strptime(data["creatordate"], DATE_FMT),
+            language=config.language,
+        )
 
 
 def setup(app):
@@ -161,10 +173,18 @@ def setup(app):
     app.add_config_value("smv_current_version", "", "html")
     app.add_config_value("smv_latest_version", "master", "html")
     app.add_config_value("smv_tag_whitelist", DEFAULT_TAG_WHITELIST, "html")
-    app.add_config_value("smv_branch_whitelist", DEFAULT_BRANCH_WHITELIST, "html")
-    app.add_config_value("smv_remote_whitelist", DEFAULT_REMOTE_WHITELIST, "html")
-    app.add_config_value("smv_released_pattern", DEFAULT_RELEASED_PATTERN, "html")
-    app.add_config_value("smv_outputdir_format", DEFAULT_OUTPUTDIR_FORMAT, "html")
+    app.add_config_value(
+        "smv_branch_whitelist", DEFAULT_BRANCH_WHITELIST, "html"
+    )
+    app.add_config_value(
+        "smv_remote_whitelist", DEFAULT_REMOTE_WHITELIST, "html"
+    )
+    app.add_config_value(
+        "smv_released_pattern", DEFAULT_RELEASED_PATTERN, "html"
+    )
+    app.add_config_value(
+        "smv_outputdir_format", DEFAULT_OUTPUTDIR_FORMAT, "html"
+    )
     app.connect("config-inited", config_inited)
 
     return {

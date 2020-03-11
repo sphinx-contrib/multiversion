@@ -6,19 +6,20 @@ import subprocess
 import re
 import tarfile
 
-GitRef = collections.namedtuple('VersionRef', [
-    'name',
-    'commit',
-    'source',
-    'is_remote',
-    'refname',
-    'creatordate',
-])
+GitRef = collections.namedtuple(
+    "VersionRef",
+    ["name", "commit", "source", "is_remote", "refname", "creatordate",],
+)
 
 
 def get_all_refs(gitroot):
-    cmd = ("git", "for-each-ref", "--format",
-           "%(objectname)\t%(refname)\t%(creatordate:iso)", "refs")
+    cmd = (
+        "git",
+        "for-each-ref",
+        "--format",
+        "%(objectname)\t%(refname)\t%(creatordate:iso)",
+        "refs",
+    )
     output = subprocess.check_output(cmd, cwd=gitroot).decode()
     for line in output.splitlines():
         is_remote = False
@@ -28,16 +29,20 @@ def get_all_refs(gitroot):
 
         commit = fields[0]
         refname = fields[1]
-        creatordate = datetime.datetime.strptime(fields[2], "%Y-%m-%d %H:%M:%S %z")
+        creatordate = datetime.datetime.strptime(
+            fields[2], "%Y-%m-%d %H:%M:%S %z"
+        )
 
         # Parse refname
-        matchobj = re.match(r"^refs/(heads|tags|remotes/[^/]+)/(\S+)$", refname)
+        matchobj = re.match(
+            r"^refs/(heads|tags|remotes/[^/]+)/(\S+)$", refname
+        )
         if not matchobj:
             continue
         source = matchobj.group(1)
         name = matchobj.group(2)
 
-        if source.startswith('remotes/'):
+        if source.startswith("remotes/"):
             is_remote = True
 
         yield GitRef(name, commit, source, is_remote, refname, creatordate)
@@ -45,17 +50,21 @@ def get_all_refs(gitroot):
 
 def get_refs(gitroot, tag_whitelist, branch_whitelist, remote_whitelist):
     for ref in get_all_refs(gitroot):
-        if ref.source == 'tags':
+        if ref.source == "tags":
             if tag_whitelist is None or not re.match(tag_whitelist, ref.name):
                 continue
-        elif ref.source == 'heads':
-            if branch_whitelist is None or not re.match(branch_whitelist, ref.name):
+        elif ref.source == "heads":
+            if branch_whitelist is None or not re.match(
+                branch_whitelist, ref.name
+            ):
                 continue
         elif ref.is_remote and remote_whitelist is not None:
-            remote_name = ref.source.partition('/')[2]
+            remote_name = ref.source.partition("/")[2]
             if not re.match(remote_whitelist, remote_name):
                 continue
-            if branch_whitelist is None or not re.match(branch_whitelist, ref.name):
+            if branch_whitelist is None or not re.match(
+                branch_whitelist, ref.name
+            ):
                 continue
         else:
             continue
@@ -63,9 +72,17 @@ def get_refs(gitroot, tag_whitelist, branch_whitelist, remote_whitelist):
         yield ref
 
 
-def copy_tree(src, dst, reference, sourcepath='.'):
+def copy_tree(src, dst, reference, sourcepath="."):
     with tempfile.SpooledTemporaryFile() as fp:
-        cmd = ("git", "archive", "--format", "tar", reference.commit, "--", sourcepath)
+        cmd = (
+            "git",
+            "archive",
+            "--format",
+            "tar",
+            reference.commit,
+            "--",
+            sourcepath,
+        )
         subprocess.check_call(cmd, stdout=fp)
         fp.seek(0)
         with tarfile.TarFile(fileobj=fp) as tarfp:
