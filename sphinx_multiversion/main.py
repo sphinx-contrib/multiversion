@@ -209,7 +209,7 @@ def main(argv=None):
                     "-D",
                     "smv_current_version={}".format(version_name),
                     "-c",
-                    args.confdir,
+                    confdir,
                     data["sourcedir"],
                     outdir,
                     *args.filenames,
