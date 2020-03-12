@@ -72,7 +72,7 @@ List releases and development versions separately
       <li><a href="{{ item.url }}">{{ item.name }}</a></li>
       {%- endfor %}
     </ul>
-    <h3>{{ _('Tags') }}</h3>
+    <h3>{{ _('In Development') }}</h3>
     <ul>
       {%- for item in versions.in_development %}
       <li><a href="{{ item.url }}">{{ item.name }}</a></li>
