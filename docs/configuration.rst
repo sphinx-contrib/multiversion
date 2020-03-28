@@ -29,7 +29,7 @@ This is what the default configuration looks like:
     # Determines whether remote or local git branches/tags are preferred if their output dirs conflict
     smv_prefer_remote_refs = False
 
-You an override all of these values inside you :file:`conf.py`.
+You can override all of these values inside your :file:`conf.py`.
 
 .. note::
 
