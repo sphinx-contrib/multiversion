@@ -58,6 +58,14 @@ def main(argv=None):
         action="store_true",
         help="dump generated metadata and exit",
     )
+    parser.add_argument(
+        "-v",
+        action="count",
+        dest="verbosity",
+        default=0,
+        help="increase logging verbosity (can be repeated)",
+    )
+
     args, argv = parser.parse_known_args(argv)
     if args.noconfig:
         return 1
@@ -203,6 +211,7 @@ def main(argv=None):
             os.makedirs(outdir, exist_ok=True)
 
             current_argv = argv.copy()
+            current_argv.extend(["-v"] * (args.verbosity - 1))
             current_argv.extend(
                 [
                     *itertools.chain(*(("-D", d) for d in args.define)),

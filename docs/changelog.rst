@@ -7,6 +7,11 @@ Changelog
 Version 0.1
 ===========
 
+Version 0.1.2
+-------------
+* Added the ability to set verbosity (one or more ``-v`` arguments) when invoking the sphinx build.
+
+
 Version 0.1.1
 -------------
 
