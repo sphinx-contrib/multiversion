@@ -50,8 +50,8 @@ Just add a :file:`index.html` file to the root directory of your ``gh-pages`` br
       <head>
         <title>Redirecting to master branch</title>
         <meta charset="utf-8">
-        <meta http-equiv="refresh" content="0; url=./master/">
-        <link rel="canonical" href="https://username.github.io/reponame/master/">
+        <meta http-equiv="refresh" content="0; url=./master/index.html">
+        <link rel="canonical" href="https://username.github.io/reponame/master/index.html">
       </head>
     </html>
 
