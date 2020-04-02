@@ -114,6 +114,7 @@ As of version 0.4.3, the `Read the Docs theme <sphinx_rtd_theme_>`_ does not sup
 So instead of adding a custom template to ``html_sidebars``, you need to create a template file named :file:`versions.html` with the following content:
 
 .. code-block:: html
+
     {%- if current_version %}
     <div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
       <span class="rst-current-version" data-toggle="rst-current-version">
