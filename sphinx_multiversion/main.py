@@ -6,6 +6,7 @@ import logging
 import os
 import pathlib
 import re
+import string
 import subprocess
 import sys
 import tempfile
@@ -199,22 +200,29 @@ def main(argv=None):
         # Run Sphinx
         argv.extend(["-D", "smv_metadata_path={}".format(metadata_path)])
         for version_name, data in metadata.items():
-            outdir = os.path.join(args.outputdir, data["outputdir"])
-            os.makedirs(outdir, exist_ok=True)
+            data["confdir"] = confdir
+            data["outputdir"] = os.path.join(args.outputdir, data["outputdir"])
+            os.makedirs(data["outputdir"], exist_ok=True)
+
+            defines = itertools.chain(*(
+                ("-D", string.Template(d).safe_substitute(data))
+                for d in args.define
+            ))
 
             current_argv = argv.copy()
             current_argv.extend(
                 [
-                    *itertools.chain(*(("-D", d) for d in args.define)),
+                    *defines,
                     "-D",
                     "smv_current_version={}".format(version_name),
                     "-c",
-                    confdir,
+                    data["confdir"],
                     data["sourcedir"],
-                    outdir,
+                    data["outputdir"],
                     *args.filenames,
                 ]
             )
+            logger.debug("Running sphinx-build with args: %r", current_argv)
             status = sphinx_build.build_main(current_argv)
             if status not in (0, None):
                 break
