@@ -180,7 +180,10 @@ def main(argv=None):
                 "source": gitref.source,
                 "creatordate": gitref.creatordate.strftime(sphinx.DATE_FMT),
                 "sourcedir": current_sourcedir,
-                "outputdir": outputdir,
+                "outputdir": os.path.join(
+                    os.path.abspath(args.outputdir), outputdir
+                ),
+                "confdir": os.path.abspath(confdir),
                 "docnames": list(project.discover()),
             }
 
@@ -200,8 +203,6 @@ def main(argv=None):
         # Run Sphinx
         argv.extend(["-D", "smv_metadata_path={}".format(metadata_path)])
         for version_name, data in metadata.items():
-            data["confdir"] = confdir
-            data["outputdir"] = os.path.join(args.outputdir, data["outputdir"])
             os.makedirs(data["outputdir"], exist_ok=True)
 
             defines = itertools.chain(
