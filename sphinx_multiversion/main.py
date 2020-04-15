@@ -204,10 +204,12 @@ def main(argv=None):
             data["outputdir"] = os.path.join(args.outputdir, data["outputdir"])
             os.makedirs(data["outputdir"], exist_ok=True)
 
-            defines = itertools.chain(*(
-                ("-D", string.Template(d).safe_substitute(data))
-                for d in args.define
-            ))
+            defines = itertools.chain(
+                *(
+                    ("-D", string.Template(d).safe_substitute(data))
+                    for d in args.define
+                )
+            )
 
             current_argv = argv.copy()
             current_argv.extend(
