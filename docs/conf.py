@@ -31,3 +31,4 @@ html_sidebars = {
 }
 
 smv_remote_whitelist = r"^origin$"
+smv_branch_whitelist = r"^master$"
