@@ -4,6 +4,12 @@
 Changelog
 =========
 
+Version 0.2
+===========
+
+* Added a way to override config variables using placeholders that expand to each version's actual value (`#4 <issue4_>`_, `#7 <issue7_>`_).
+
+
 Version 0.1
 ===========
 
@@ -17,3 +23,7 @@ Version 0.1.0
 -------------
 
 * Initial release
+
+
+.. _issue4: https://github.com/Holzhaus/sphinx-multiversion/issues/4
+.. _issue7: https://github.com/Holzhaus/sphinx-multiversion/issues/7

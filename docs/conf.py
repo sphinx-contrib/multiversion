@@ -4,8 +4,8 @@ import time
 
 author = "Jan Holthuis"
 project = "sphinx-multiversion"
-release = "0.1.1"
-version = "0.1"
+release = "0.2.0"
+version = "0.2"
 copyright = "{}, {}".format(time.strftime("%Y"), author)
 
 html_last_updated_fmt = "%c"
@@ -30,4 +30,5 @@ html_sidebars = {
     ],
 }
 
-mv_remote_whitelist = r"^origin$"
+smv_remote_whitelist = r"^origin$"
+smv_branch_whitelist = r"^master$"
