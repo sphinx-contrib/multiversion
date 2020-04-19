@@ -7,6 +7,15 @@ Changelog
 Version 0.2
 ===========
 
+Version 0.2.1
+-------------
+
+* Fix handling of absolute output paths in `vpathto` and ensure that all generated paths are relative.
+
+
+Version 0.2.0
+-------------
+
 * Added a way to override config variables using placeholders that expand to each version's actual value (`#4 <issue4_>`_, `#7 <issue7_>`_).
 
 

@@ -99,13 +99,31 @@ class VersionInfo:
 
         # Find output root
         current_version = self.metadata[self.current_version_name]
-        relpath = pathlib.PurePath(current_version["outputdir"])
-        relpath_dir = relpath.joinpath(self.context["pagename"]).parent
-        outputroot = os.path.join(*(".." for x in relpath_dir.parts))
+        other_version = self.metadata[other_version_name]
+        outputroot = os.path.commonpath(
+            (current_version["outputdir"], other_version["outputdir"])
+        )
+
+        current_outputroot = pathlib.PurePath(
+            current_version["outputdir"]
+        ).relative_to(outputroot)
+        other_outputroot = pathlib.PurePath(
+            other_version["outputdir"]
+        ).relative_to(outputroot)
+
+        relative_path_to_outputroot = os.path.join(
+            *(
+                ".."
+                for x in current_outputroot.joinpath(
+                    self.context["pagename"]
+                ).parent.parts
+            )
+        )
 
         # Find output dir of other version
-        other_version = self.metadata[other_version_name]
-        outputdir = posixpath.join(outputroot, other_version["outputdir"])
+        outputdir = posixpath.join(
+            relative_path_to_outputroot, other_outputroot
+        )
 
         if not self.vhasdoc(other_version_name):
             return posixpath.join(outputdir, "index.html")
