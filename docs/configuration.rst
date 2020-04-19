@@ -107,5 +107,30 @@ Here are some examples:
     Have a look at `PyFormat <python_format_>`_ for information how to use new-stye Python formatting.
 
 
+Overriding Configuration Variables
+==================================
+
+You can override configuration variables the same way as you're used to with ``sphinx-build``.
+
+Since ``sphinx-multiversion`` copies the branch data into a temporary directory and builds them there while leaving the current working directory unchanged, relative paths in your :file:`conf.py` will refer to the path of the version *you're building from*, not the path of the version you are trying to build documentation for.
+
+Sometimes it might be necessary to override the configured path via a command line overide.
+``sphinx-multiversion`` allows you to insert placeholders into your override strings that will automatically be replaced with the correct value for the version you're building the documentation for.
+
+Here's an example for the `exhale extension <exhale_>`_:
+
+.. code-block:: python
+
+    sphinx-multiversion docs build/html -D 'exhale_args.containmentFolder=${sourcedir}/api'
+
+.. note::
+
+    Make sure to enclose the override string in single quotes (``'``) to prevent the shell from treating it as an environment variable and replacing it before it's passed to ``sphinx-multiversion``.
+
+.. note::
+
+    To see a list of available placeholder names and their values for each version you can use the ``--dump-metadata`` flag.
+
 .. _python_regex: https://docs.python.org/3/howto/regex.html
 .. _python_format: https://pyformat.info/
+.. _exhale: https://exhale.readthedocs.io/en/latest/
