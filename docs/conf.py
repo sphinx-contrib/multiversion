@@ -30,4 +30,4 @@ html_sidebars = {
     ],
 }
 
-mv_remote_whitelist = r"^origin$"
+smv_remote_whitelist = r"^origin$"
