@@ -10,6 +10,7 @@ import string
 import subprocess
 import sys
 import tempfile
+import shutil
 
 from sphinx.cmd import build as sphinx_build
 from sphinx import config as sphinx_config
@@ -144,6 +145,7 @@ def main(argv=None):
                     gitref.refname,
                     confpath,
                 )
+                shutil.rmtree(repopath)
                 continue
             current_config.pre_init_values()
             current_config.init_values()
@@ -158,6 +160,7 @@ def main(argv=None):
                     outputdir,
                     gitref.refname,
                 )
+                shutil.rmtree(repopath)
                 continue
             outputdirs.add(outputdir)
 
@@ -229,3 +232,5 @@ def main(argv=None):
             status = sphinx_build.build_main(current_argv)
             if status not in (0, None):
                 break
+
+        tmp.cleanup()
