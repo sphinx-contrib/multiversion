@@ -91,13 +91,22 @@ def main(argv=None):
     config.pre_init_values()
     config.init_values()
 
-    # Get git references
+    # Get relative paths to root of git repository
     gitroot = pathlib.Path(".").resolve()
+    sourcedir = os.path.relpath(args.sourcedir, str(gitroot))
+    if args.confdir:
+        confdir = os.path.relpath(args.confdir, str(gitroot))
+    else:
+        confdir = sourcedir
+    conffile = os.path.join(confdir, "conf.py")
+
+    # Get git references
     gitrefs = git.get_refs(
         str(gitroot),
         config.smv_tag_whitelist,
         config.smv_branch_whitelist,
         config.smv_remote_whitelist,
+        files=(sourcedir, conffile),
     )
 
     # Order git refs
@@ -107,13 +116,6 @@ def main(argv=None):
         gitrefs = sorted(gitrefs, key=lambda x: (x.is_remote, *x))
 
     logger = logging.getLogger(__name__)
-
-    # Get Sourcedir
-    sourcedir = os.path.relpath(args.sourcedir, str(gitroot))
-    if args.confdir:
-        confdir = os.path.relpath(args.confdir, str(gitroot))
-    else:
-        confdir = sourcedir
 
     with tempfile.TemporaryDirectory() as tmp:
         # Generate Metadata
