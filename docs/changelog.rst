@@ -7,6 +7,12 @@ Changelog
 Version 0.2
 ===========
 
+Version 0.2.2
+-------------
+
+* Added additional checks to determine if a branch or tag contains both the Sphinx source directory and the :file:`conf.py` file. If that's not the case, that branch or tag is skipped automatically and not copied to the temporary directory. (`#9 <issue9_>`_)
+
+
 Version 0.2.1
 -------------
 
@@ -36,3 +42,4 @@ Version 0.1.0
 
 .. _issue4: https://github.com/Holzhaus/sphinx-multiversion/issues/4
 .. _issue7: https://github.com/Holzhaus/sphinx-multiversion/issues/7
+.. _issue9: https://github.com/Holzhaus/sphinx-multiversion/issues/9

@@ -33,8 +33,7 @@ You can override all of these values inside your :file:`conf.py`.
 
 .. note::
 
-    You can check which tags/branches are matched by running ``sphinx-multiversion`` with the ``--dump-metadata`` flag.
-
+    You can check which tags/branches are matched by running ``sphinx-multiversion`` with the ``--dump-metadata`` flag. Branches or tags that don't contain both the sphinx source directory and the :file:`conf.py` file will be skipped automatically.
 
 Tag/Branch/Remote whitelists
 ============================

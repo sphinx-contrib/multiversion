@@ -48,7 +48,9 @@ def get_all_refs(gitroot):
         yield GitRef(name, commit, source, is_remote, refname, creatordate)
 
 
-def get_refs(gitroot, tag_whitelist, branch_whitelist, remote_whitelist):
+def get_refs(
+    gitroot, tag_whitelist, branch_whitelist, remote_whitelist, files=()
+):
     for ref in get_all_refs(gitroot):
         if ref.source == "tags":
             if tag_whitelist is None or not re.match(tag_whitelist, ref.name):
@@ -69,7 +71,25 @@ def get_refs(gitroot, tag_whitelist, branch_whitelist, remote_whitelist):
         else:
             continue
 
+        if not all(
+            file_exists(gitroot, ref.name, filename) for filename in files
+        ):
+            continue
+
         yield ref
+
+
+def file_exists(gitroot, refname, filename):
+    cmd = (
+        "git",
+        "cat-file",
+        "-e",
+        "{}:{}".format(refname, filename),
+    )
+    proc = subprocess.run(
+        cmd, cwd=gitroot, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+    )
+    return proc.returncode == 0
 
 
 def copy_tree(src, dst, reference, sourcepath="."):
