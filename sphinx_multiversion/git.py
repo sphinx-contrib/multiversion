@@ -86,7 +86,9 @@ def file_exists(gitroot, refname, filename):
         "-e",
         "{}:{}".format(refname, filename),
     )
-    proc = subprocess.run(cmd, cwd=gitroot, capture_output=True)
+    proc = subprocess.run(
+        cmd, cwd=gitroot, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+    )
     return proc.returncode == 0
 
 
