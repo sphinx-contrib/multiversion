@@ -7,6 +7,12 @@ Changelog
 Version 0.2
 ===========
 
+Version 0.2.3
+-------------
+
+* Fix return codes of main() function and exit with non-zero status if no matching refs were found.
+
+
 Version 0.2.2
 -------------
 
