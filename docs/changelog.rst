@@ -10,7 +10,8 @@ Version 0.2
 Version 0.2.3
 -------------
 
-* Fix return codes of main() function and exit with non-zero status if no matching refs were found.
+* Fixed return codes of main() function and exit with non-zero status if no matching refs were found.
+* Added some logging calls to the git module.
 
 
 Version 0.2.2
@@ -22,7 +23,7 @@ Version 0.2.2
 Version 0.2.1
 -------------
 
-* Fix handling of absolute output paths in `vpathto` and ensure that all generated paths are relative.
+* Fixed handling of absolute output paths in `vpathto` and ensure that all generated paths are relative.
 
 
 Version 0.2.0
