@@ -191,11 +191,11 @@ def main(argv=None):
 
         if args.dump_metadata:
             print(json.dumps(metadata, indent=2))
-            return
+            return 0
 
         if not metadata:
             logger.error("No matching refs found!")
-            return
+            return 2
 
         # Write Metadata
         metadata_path = os.path.abspath(os.path.join(tmp, "versions.json"))
@@ -230,4 +230,6 @@ def main(argv=None):
             logger.debug("Running sphinx-build with args: %r", current_argv)
             status = sphinx_build.build_main(current_argv)
             if status not in (0, None):
-                break
+                return 3
+
+    return 0
