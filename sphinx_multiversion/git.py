@@ -1,15 +1,18 @@
 # -*- coding: utf-8 -*-
 import collections
 import datetime
-import tempfile
-import subprocess
+import logging
 import re
+import subprocess
 import tarfile
+import tempfile
 
 GitRef = collections.namedtuple(
     "VersionRef",
     ["name", "commit", "source", "is_remote", "refname", "creatordate",],
 )
+
+logger = logging.getLogger(__name__)
 
 
 def get_all_refs(gitroot):
@@ -54,26 +57,61 @@ def get_refs(
     for ref in get_all_refs(gitroot):
         if ref.source == "tags":
             if tag_whitelist is None or not re.match(tag_whitelist, ref.name):
+                logger.debug(
+                    "Skipping '%s' because tag '%s' doesn't match the "
+                    "whitelist pattern",
+                    ref.refname,
+                    ref.name,
+                )
                 continue
         elif ref.source == "heads":
             if branch_whitelist is None or not re.match(
                 branch_whitelist, ref.name
             ):
+                logger.debug(
+                    "Skipping '%s' because branch '%s' doesn't match the "
+                    "whitelist pattern",
+                    ref.refname,
+                    ref.name,
+                )
                 continue
         elif ref.is_remote and remote_whitelist is not None:
             remote_name = ref.source.partition("/")[2]
             if not re.match(remote_whitelist, remote_name):
+                logger.debug(
+                    "Skipping '%s' because remote '%s' doesn't match the "
+                    "whitelist pattern",
+                    ref.refname,
+                    remote_name,
+                )
                 continue
             if branch_whitelist is None or not re.match(
                 branch_whitelist, ref.name
             ):
+                logger.debug(
+                    "Skipping '%s' because branch '%s' doesn't match the "
+                    "whitelist pattern",
+                    ref.refname,
+                    ref.name,
+                )
                 continue
         else:
+            logger.debug(
+                "Skipping '%s' because its not a branch or tag", ref.refname
+            )
             continue
 
-        if not all(
-            file_exists(gitroot, ref.name, filename) for filename in files
-        ):
+        missing_files = [
+            filename
+            for filename in files
+            if not file_exists(gitroot, ref.name, filename)
+        ]
+        if missing_files:
+            logger.debug(
+                "Skipping '%s' because it lacks required files: %r",
+                ref.refname,
+                missing_files,
+            )
             continue
 
         yield ref
