@@ -104,7 +104,7 @@ def get_refs(
         missing_files = [
             filename
             for filename in files
-            if not file_exists(gitroot, ref.name, filename)
+            if not file_exists(gitroot, ref.refname, filename)
         ]
         if missing_files:
             logger.debug(

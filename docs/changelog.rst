@@ -12,6 +12,7 @@ Version 0.2.3
 
 * Fixed return codes of main() function and exit with non-zero status if no matching refs were found.
 * Added some logging calls to the git module.
+* Fix bug where local branch was used to check the existence of files on remote branches.
 
 
 Version 0.2.2
