@@ -118,6 +118,8 @@ def get_refs(
 
 
 def file_exists(gitroot, refname, filename):
+    if filename == '.':
+        filename += '/'
     cmd = (
         "git",
         "cat-file",
