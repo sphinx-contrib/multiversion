@@ -118,6 +118,7 @@ def get_refs(
 
 
 def file_exists(gitroot, refname, filename):
+    # Correct path in the case of documentation is located in the local folder.
     if filename == '.':
         filename += '/'
     cmd = (
