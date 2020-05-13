@@ -13,7 +13,7 @@ install:
 - python setup.py install
 
 before_script:
-- pre-commit run --all-files
+- pre-commit run --all-files --show-diff-on-failure
 script:
 - mkdir html
 - git fetch --all
