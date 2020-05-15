@@ -171,7 +171,7 @@ def config_inited(app, config):
     app.connect("html-page-context", html_page_context)
 
     # Restore config values
-    old_config = sphinx_config.Config.read(app.srcdir)
+    old_config = sphinx_config.Config.read(app.confdir)
     old_config.pre_init_values()
     old_config.init_values()
     config.version = old_config.version
