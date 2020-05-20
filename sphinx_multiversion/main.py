@@ -63,6 +63,13 @@ def main(argv=None):
     if args.noconfig:
         return 1
 
+    sourcedir_absolute = os.path.abspath(args.sourcedir)
+    confdir_absolute = (
+        os.path.abspath(args.confdir)
+        if args.confdir is not None
+        else sourcedir_absolute
+    )
+
     # Conf-overrides
     confoverrides = {}
     for d in args.define:
@@ -70,10 +77,7 @@ def main(argv=None):
         confoverrides[key] = value
 
     # Parse config
-    config = sphinx_config.Config.read(
-        os.path.abspath(args.confdir if args.confdir else args.sourcedir),
-        confoverrides,
-    )
+    config = sphinx_config.Config.read(confdir_absolute, confoverrides)
     config.add("smv_tag_whitelist", sphinx.DEFAULT_TAG_WHITELIST, "html", str)
     config.add(
         "smv_branch_whitelist", sphinx.DEFAULT_TAG_WHITELIST, "html", str
@@ -93,9 +97,9 @@ def main(argv=None):
 
     # Get relative paths to root of git repository
     gitroot = pathlib.Path(".").resolve()
-    sourcedir = os.path.relpath(args.sourcedir, str(gitroot))
+    sourcedir = os.path.relpath(sourcedir_absolute, str(gitroot))
     if args.confdir:
-        confdir = os.path.relpath(args.confdir, str(gitroot))
+        confdir = os.path.relpath(confdir_absolute, str(gitroot))
     else:
         confdir = sourcedir
     conffile = os.path.join(confdir, "conf.py")
@@ -185,7 +189,7 @@ def main(argv=None):
                 "outputdir": os.path.join(
                     os.path.abspath(args.outputdir), outputdir
                 ),
-                "confdir": os.path.abspath(confdir),
+                "confdir": confpath,
                 "docnames": list(project.discover()),
             }
 
