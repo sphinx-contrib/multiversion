@@ -2,6 +2,7 @@
 import collections
 import datetime
 import logging
+import os
 import re
 import subprocess
 import tarfile
@@ -119,6 +120,10 @@ def get_refs(
 
 
 def file_exists(gitroot, refname, filename):
+    if os.sep != "/":
+        # Git requires / path sep, make sure we use that
+        filename = filename.replace(os.sep, "/")
+
     cmd = (
         "git",
         "cat-file",
