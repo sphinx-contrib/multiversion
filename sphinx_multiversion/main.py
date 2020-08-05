@@ -189,7 +189,7 @@ def main(argv=None):
                 "outputdir": os.path.join(
                     os.path.abspath(args.outputdir), outputdir
                 ),
-                "confdir": confpath,
+                "confdir": confdir_absolute,
                 "docnames": list(project.discover()),
             }
 
