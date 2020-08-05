@@ -13,6 +13,7 @@ Version 0.2.4 (unreleased)
 * Skip file existence check for the :file:`.` directory. This fixes an issue if the configuration or source directory is in the local path but reported as missing, because ``git cat-file -e`` always reports an error in that case. (`#12 <issue12_>`_)
 * Fix file existence check not working on Windows. (`#18 <issue18_>`_, `#19 <issue19_>`_)
 * Fix bug in the sphinx extension which tried to load the `conf.py` from the source directory instead of the conf directory. This could lead to problems when the two directories differ. (`#11 <issue11_>`_, `#13 <issue11_>`_)
+* Fix wrong import in :file:`__main__.py` that prevented invocation using ``python -m sphinx_multiversion``. (`#23 <issue23_>`_)
 
 
 Version 0.2.3
@@ -64,3 +65,4 @@ Version 0.1.0
 .. _issue13: https://github.com/Holzhaus/sphinx-multiversion/issues/13
 .. _issue18: https://github.com/Holzhaus/sphinx-multiversion/issues/18
 .. _issue19: https://github.com/Holzhaus/sphinx-multiversion/issues/19
+.. _issue23: https://github.com/Holzhaus/sphinx-multiversion/issues/23
