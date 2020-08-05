@@ -14,6 +14,7 @@ Version 0.2.4 (unreleased)
 * Fix file existence check not working on Windows. (`#18 <issue18_>`_, `#19 <issue19_>`_)
 * Fix bug in the sphinx extension which tried to load the `conf.py` from the source directory instead of the conf directory. This could lead to problems when the two directories differ. (`#11 <issue11_>`_, `#13 <issue13_>`_)
 * Fix wrong import in :file:`__main__.py` that prevented invocation using ``python -m sphinx_multiversion``. (`#23 <issue23_>`_)
+* Fix failure to find refs if ``sphinx-multiversion`` was not invoked from the root of the git repository. (`#24 <issue24_>`_, `#25 <issue25_>`_)
 
 
 Version 0.2.3
@@ -66,3 +67,5 @@ Version 0.1.0
 .. _issue18: https://github.com/Holzhaus/sphinx-multiversion/issues/18
 .. _issue19: https://github.com/Holzhaus/sphinx-multiversion/issues/19
 .. _issue23: https://github.com/Holzhaus/sphinx-multiversion/issues/23
+.. _issue24: https://github.com/Holzhaus/sphinx-multiversion/issues/24
+.. _issue25: https://github.com/Holzhaus/sphinx-multiversion/issues/25
