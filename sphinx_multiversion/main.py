@@ -11,7 +11,6 @@ import subprocess
 import sys
 import tempfile
 
-from sphinx.cmd import build as sphinx_build
 from sphinx import config as sphinx_config
 from sphinx import project as sphinx_project
 
@@ -232,8 +231,7 @@ def main(argv=None):
                 ]
             )
             logger.debug("Running sphinx-build with args: %r", current_argv)
-            status = sphinx_build.build_main(current_argv)
-            if status not in (0, None):
-                return 3
+            cmd = (sys.executable, "-m", "sphinx", *current_argv)
+            subprocess.check_call(cmd)
 
     return 0
