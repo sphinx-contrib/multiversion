@@ -32,6 +32,15 @@ def main(argv=None):
         help="a list of specific files to rebuild. Ignored if -a is specified",
     )
     parser.add_argument(
+        "-d",
+        metavar="PATH",
+        dest="doctreedir",
+        help=(
+            "path for the cached environment and doctree files "
+            "(default: OUTPUTDIR/.doctrees)"
+        ),
+    )
+    parser.add_argument(
         "-c",
         metavar="PATH",
         dest="confdir",
@@ -68,6 +77,11 @@ def main(argv=None):
         os.path.abspath(args.confdir)
         if args.confdir is not None
         else sourcedir_absolute
+    )
+    doctreedir_absolute = os.path.abspath(
+        args.doctreedir
+        if args.doctreedir is not None
+        else os.path.join(args.outputdir, ".doctrees")
     )
 
     # Conf-overrides
@@ -190,6 +204,9 @@ def main(argv=None):
                     os.path.abspath(args.outputdir), outputdir
                 ),
                 "confdir": confpath,
+                "doctreedir": os.path.join(
+                    os.path.abspath(doctreedir_absolute), outputdir
+                ),
                 "docnames": list(project.discover()),
             }
 
@@ -226,6 +243,8 @@ def main(argv=None):
                     "smv_current_version={}".format(version_name),
                     "-c",
                     data["confdir"],
+                    "-d",
+                    data["doctreedir"],
                     data["sourcedir"],
                     data["outputdir"],
                     *args.filenames,
