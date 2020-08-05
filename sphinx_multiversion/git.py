@@ -16,6 +16,16 @@ GitRef = collections.namedtuple(
 logger = logging.getLogger(__name__)
 
 
+def get_toplevel_path(cwd=None):
+    cmd = (
+        "git",
+        "rev-parse",
+        "--show-toplevel",
+    )
+    output = subprocess.check_output(cmd, cwd=cwd).decode()
+    return output.rstrip("\n")
+
+
 def get_all_refs(gitroot):
     cmd = (
         "git",
@@ -136,7 +146,7 @@ def file_exists(gitroot, refname, filename):
     return proc.returncode == 0
 
 
-def copy_tree(src, dst, reference, sourcepath="."):
+def copy_tree(gitroot, src, dst, reference, sourcepath="."):
     with tempfile.SpooledTemporaryFile() as fp:
         cmd = (
             "git",
@@ -147,7 +157,7 @@ def copy_tree(src, dst, reference, sourcepath="."):
             "--",
             sourcepath,
         )
-        subprocess.check_call(cmd, stdout=fp)
+        subprocess.check_call(cmd, cwd=gitroot, stdout=fp)
         fp.seek(0)
         with tarfile.TarFile(fileobj=fp) as tarfp:
             tarfp.extractall(dst)
