@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 import itertools
 import argparse
+import multiprocessing
+import contextlib
 import json
 import logging
 import os
@@ -17,6 +19,75 @@ from sphinx import project as sphinx_project
 
 from . import sphinx
 from . import git
+
+
+@contextlib.contextmanager
+def working_dir(path):
+    prev_cwd = os.getcwd()
+    os.chdir(path)
+    try:
+        yield
+    finally:
+        os.chdir(prev_cwd)
+
+
+def load_sphinx_config_worker(q, confpath, confoverrides, add_defaults):
+    try:
+        with working_dir(confpath):
+            current_config = sphinx_config.Config.read(
+                confpath, confoverrides,
+            )
+
+        if add_defaults:
+            current_config.add(
+                "smv_tag_whitelist", sphinx.DEFAULT_TAG_WHITELIST, "html", str
+            )
+            current_config.add(
+                "smv_branch_whitelist",
+                sphinx.DEFAULT_TAG_WHITELIST,
+                "html",
+                str,
+            )
+            current_config.add(
+                "smv_remote_whitelist",
+                sphinx.DEFAULT_REMOTE_WHITELIST,
+                "html",
+                str,
+            )
+            current_config.add(
+                "smv_released_pattern",
+                sphinx.DEFAULT_RELEASED_PATTERN,
+                "html",
+                str,
+            )
+            current_config.add(
+                "smv_outputdir_format",
+                sphinx.DEFAULT_OUTPUTDIR_FORMAT,
+                "html",
+                str,
+            )
+            current_config.add("smv_prefer_remote_refs", False, "html", bool)
+        current_config.pre_init_values()
+        current_config.init_values()
+    except Exception as err:
+        q.put(err)
+        return
+
+    q.put(current_config)
+
+
+def load_sphinx_config(confpath, confoverrides, add_defaults=False):
+    q = multiprocessing.Queue()
+    proc = multiprocessing.Process(
+        target=load_sphinx_config_worker,
+        args=(q, confpath, confoverrides, add_defaults),
+    )
+    proc.start()
+    proc.join()
+    result = q.get_nowait()
+    if isinstance(result, Exception):
+        raise result
+    return result
 
 
 def main(argv=None):
@@ -77,23 +148,9 @@ def main(argv=None):
         confoverrides[key] = value
 
     # Parse config
-    config = sphinx_config.Config.read(confdir_absolute, confoverrides)
-    config.add("smv_tag_whitelist", sphinx.DEFAULT_TAG_WHITELIST, "html", str)
-    config.add(
-        "smv_branch_whitelist", sphinx.DEFAULT_TAG_WHITELIST, "html", str
+    config = load_sphinx_config(
+        confdir_absolute, confoverrides, add_defaults=True
     )
-    config.add(
-        "smv_remote_whitelist", sphinx.DEFAULT_REMOTE_WHITELIST, "html", str
-    )
-    config.add(
-        "smv_released_pattern", sphinx.DEFAULT_RELEASED_PATTERN, "html", str
-    )
-    config.add(
-        "smv_outputdir_format", sphinx.DEFAULT_OUTPUTDIR_FORMAT, "html", str
-    )
-    config.add("smv_prefer_remote_refs", False, "html", bool)
-    config.pre_init_values()
-    config.init_values()
 
     # Get relative paths to root of git repository
     gitroot = pathlib.Path(".").resolve()
@@ -141,9 +198,7 @@ def main(argv=None):
             # Find config
             confpath = os.path.join(repopath, confdir)
             try:
-                current_config = sphinx_config.Config.read(
-                    confpath, confoverrides,
-                )
+                current_config = load_sphinx_config(confpath, confoverrides)
             except (OSError, sphinx_config.ConfigError):
                 logger.error(
                     "Failed load config for %s from %s",
@@ -151,8 +206,6 @@ def main(argv=None):
                     confpath,
                 )
                 continue
-            current_config.pre_init_values()
-            current_config.init_values()
 
             # Ensure that there are not duplicate output dirs
             outputdir = config.smv_outputdir_format.format(
