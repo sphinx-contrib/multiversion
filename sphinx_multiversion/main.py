@@ -62,6 +62,8 @@ def main(argv=None):
     if args.noconfig:
         return 1
 
+    logger = logging.getLogger(__name__)
+
     sourcedir_absolute = os.path.abspath(args.sourcedir)
     confdir_absolute = (
         os.path.abspath(args.confdir)
@@ -95,12 +97,19 @@ def main(argv=None):
     config.init_values()
 
     # Get relative paths to root of git repository
-    gitroot = pathlib.Path(".").resolve()
+    gitroot = pathlib.Path(
+        git.get_toplevel_path(cwd=sourcedir_absolute)
+    ).resolve()
+    logger.debug("Git toplevel path: %s", str(gitroot))
     sourcedir = os.path.relpath(sourcedir_absolute, str(gitroot))
+    logger.debug(
+        "Source dir (relative to git toplevel path): %s", str(sourcedir)
+    )
     if args.confdir:
         confdir = os.path.relpath(confdir_absolute, str(gitroot))
     else:
         confdir = sourcedir
+    logger.debug("Conf dir (relative to git toplevel path): %s", str(confdir))
     conffile = os.path.join(confdir, "conf.py")
 
     # Get git references
@@ -128,7 +137,7 @@ def main(argv=None):
             # Clone Git repo
             repopath = os.path.join(tmp, gitref.commit)
             try:
-                git.copy_tree(gitroot.as_uri(), repopath, gitref)
+                git.copy_tree(str(gitroot), gitroot.as_uri(), repopath, gitref)
             except (OSError, subprocess.CalledProcessError):
                 logger.error(
                     "Failed to copy git tree for %s to %s",
@@ -188,7 +197,7 @@ def main(argv=None):
                 "outputdir": os.path.join(
                     os.path.abspath(args.outputdir), outputdir
                 ),
-                "confdir": confpath,
+                "confdir": confdir_absolute,
                 "docnames": list(project.discover()),
             }
 
