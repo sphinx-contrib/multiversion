@@ -12,3 +12,17 @@ repos:
     rev: stable
     hooks:
     -   id: black
+- repo: local
+  hooks:
+  - id: version-check
+    name: version-check
+    description: "Check if version is consistent in all source files"
+    entry: .pre-commit/version_check.py
+    pass_filenames: false
+    stages:
+    - commit
+    - manual
+    language: python
+    files: ^(\.pre-commit/version_check\.py|setup\.py|docs/conf\.py|docs/changelog\.rst)$
+    additional_dependencies:
+    - sphinx
