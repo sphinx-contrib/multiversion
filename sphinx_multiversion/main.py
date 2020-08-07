@@ -11,7 +11,6 @@ import subprocess
 import sys
 import tempfile
 
-from sphinx.cmd import build as sphinx_build
 from sphinx import config as sphinx_config
 from sphinx import project as sphinx_project
 
@@ -101,6 +100,9 @@ def main(argv=None):
     gitroot = pathlib.Path(
         git.get_toplevel_path(cwd=sourcedir_absolute)
     ).resolve()
+    cwd_absolute = os.path.abspath(".")
+    cwd_relative = os.path.relpath(cwd_absolute, str(gitroot))
+
     logger.debug("Git toplevel path: %s", str(gitroot))
     sourcedir = os.path.relpath(sourcedir_absolute, str(gitroot))
     logger.debug(
@@ -194,6 +196,7 @@ def main(argv=None):
                 ),
                 "source": gitref.source,
                 "creatordate": gitref.creatordate.strftime(sphinx.DATE_FMT),
+                "basedir": repopath,
                 "sourcedir": current_sourcedir,
                 "outputdir": os.path.join(
                     os.path.abspath(args.outputdir), outputdir
@@ -241,8 +244,8 @@ def main(argv=None):
                 ]
             )
             logger.debug("Running sphinx-build with args: %r", current_argv)
-            status = sphinx_build.build_main(current_argv)
-            if status not in (0, None):
-                return 3
+            cmd = (sys.executable, "-m", "sphinx", *current_argv)
+            current_cwd = os.path.join(data["basedir"], cwd_relative)
+            subprocess.check_call(cmd, cwd=current_cwd)
 
     return 0
