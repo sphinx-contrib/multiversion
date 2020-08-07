@@ -1,4 +1,7 @@
+#!/usr/bin/env python3
+import importlib.util
 import os
+import pkgutil
 import re
 import runpy
 import subprocess
@@ -85,10 +88,30 @@ def get_setuppy_version(rootdir):
     return version, release
 
 
+def get_package_version(rootdir):
+    """Get version from package __init__.py."""
+    sys.path.insert(0, os.path.join(rootdir))
+    for modinfo in pkgutil.walk_packages(path=[rootdir]):
+        if modinfo.ispkg and modinfo.name == "sphinx_multiversion":
+            break
+    else:
+        raise FileNotFoundError("package not found")
+
+    spec = modinfo.module_finder.find_spec(modinfo.name)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+
+    release = mod.__version__
+    version = release.rpartition(".")[0]
+
+    return version, release
+
+
 def main():
     rootdir = os.path.join(os.path.dirname(__file__), "..")
 
     setuppy_version, setuppy_release = get_setuppy_version(rootdir)
+    package_version, package_release = get_package_version(rootdir)
     confpy_version, confpy_release = get_setuppy_version(rootdir)
     changelog_version, changelog_release = get_setuppy_version(rootdir)
 
@@ -97,6 +120,7 @@ def main():
         [
             len(version_head),
             len(setuppy_version),
+            len(package_version),
             len(confpy_version),
             len(changelog_version),
         ]
@@ -107,6 +131,7 @@ def main():
         [
             len(release_head),
             len(setuppy_release),
+            len(package_release),
             len(confpy_release),
             len(changelog_release),
         ]
@@ -118,6 +143,8 @@ def main():
         f" {'-' * release_width}\n"
         f"setup.py                        {setuppy_version:>{version_width}}"
         f" {setuppy_release:>{release_width}}\n"
+        f"sphinx_multiversion/__init__.py {package_version:>{version_width}}"
+        f" {package_release:>{release_width}}\n"
         f"docs/conf.py                    {confpy_version:>{version_width}}"
         f" {confpy_release:>{release_width}}\n"
         f"docs/changelog.rst              {changelog_version:>{version_width}}"
@@ -125,9 +152,11 @@ def main():
     )
 
     assert setuppy_version == confpy_version
+    assert setuppy_version == package_version
     assert setuppy_version == changelog_version
 
     assert setuppy_release == confpy_release
+    assert setuppy_release == package_release
     assert setuppy_release == changelog_release
 
 
