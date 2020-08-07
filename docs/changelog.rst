@@ -15,6 +15,7 @@ Version 0.2.4 (unreleased)
 * Fix bug in the sphinx extension which tried to load the `conf.py` from the source directory instead of the conf directory. This could lead to problems when the two directories differ. (`#11 <issue11_>`_, `#13 <issue13_>`_)
 * Fix wrong import in :file:`__main__.py` that prevented invocation using ``python -m sphinx_multiversion``. (`#23 <issue23_>`_)
 * Fix failure to find refs if ``sphinx-multiversion`` was not invoked from the root of the git repository. (`#24 <issue24_>`_, `#25 <issue25_>`_, `#26 <issue26_>`_)
+* Resolve issues with Sphinx extensions and Python modules not being reloaded when parsing the different :file:`conf.py` files. Now, each config file is parsed in it's own process, and the build is performed using the ``subprocess`` module instead of doing it all from the context of the main module. (`#22 <issue22_>`_, `#28 <issue28_>`_, `#30 <issue30_>`_)
 
 
 Version 0.2.3
@@ -66,7 +67,10 @@ Version 0.1.0
 .. _issue13: https://github.com/Holzhaus/sphinx-multiversion/issues/13
 .. _issue18: https://github.com/Holzhaus/sphinx-multiversion/issues/18
 .. _issue19: https://github.com/Holzhaus/sphinx-multiversion/issues/19
+.. _issue22: https://github.com/Holzhaus/sphinx-multiversion/issues/22
 .. _issue23: https://github.com/Holzhaus/sphinx-multiversion/issues/23
 .. _issue24: https://github.com/Holzhaus/sphinx-multiversion/issues/24
 .. _issue25: https://github.com/Holzhaus/sphinx-multiversion/issues/25
 .. _issue26: https://github.com/Holzhaus/sphinx-multiversion/issues/26
+.. _issue28: https://github.com/Holzhaus/sphinx-multiversion/issues/28
+.. _issue30: https://github.com/Holzhaus/sphinx-multiversion/issues/30
