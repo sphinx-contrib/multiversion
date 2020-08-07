@@ -111,7 +111,7 @@ class VersionInfo:
             other_version["outputdir"]
         ).relative_to(outputroot)
 
-        relative_path_to_outputroot = os.path.join(
+        relative_path_to_outputroot = posixpath.join(
             *(
                 ".."
                 for x in current_outputroot.joinpath(
