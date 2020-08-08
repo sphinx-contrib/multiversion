@@ -107,7 +107,7 @@ class VersionInfo:
         current_outputroot = pathlib.PurePath(
             current_version["outputdir"]
         ).relative_to(outputroot)
-        other_outputroot = pathlib.PurePath(
+        other_outputroot = pathlib.PurePosixPath(
             other_version["outputdir"]
         ).relative_to(outputroot)
 
