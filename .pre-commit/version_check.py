@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 import importlib.util
 import os
 import pkgutil
@@ -11,6 +11,8 @@ import docutils.nodes
 import docutils.parsers.rst
 import docutils.utils
 import docutils.frontend
+
+CHANGELOG_PATTERN = re.compile(r"^Version (\S+)((?: \(unreleased\)))?$")
 
 
 def parse_rst(text: str) -> docutils.nodes.document:
@@ -51,14 +53,12 @@ def get_sphinxchangelog_version(rootdir):
     assert len(visitor.sectiontitles_found) == len(unique_sectiontitles)
     assert visitor.sectiontitles_found[0] == "Changelog"
 
-    changelog_pattern = re.compile(r"^Version (\S+)((?: \(unreleased\)))?$")
-
-    matchobj = changelog_pattern(visitor.sectiontitles_found[1])
+    matchobj = CHANGELOG_PATTERN.match(visitor.sectiontitles_found[1])
     assert matchobj
     version = matchobj.group(1)
     version_unreleased = matchobj.group(2)
 
-    matchobj = changelog_pattern(visitor.sectiontitles_found[2])
+    matchobj = CHANGELOG_PATTERN.match(visitor.sectiontitles_found[2])
     assert matchobj
     release = matchobj.group(1)
     release_unreleased = matchobj.group(2)
@@ -83,7 +83,7 @@ def get_setuppy_version(rootdir):
     """Get version from setup.py."""
     setupfile = os.path.join(rootdir, "setup.py")
     cmd = (sys.executable, setupfile, "--version")
-    release = subprocess.check_output(cmd, text=True).rstrip("\n")
+    release = subprocess.check_output(cmd).decode().rstrip(os.linesep)
     version = release.rpartition(".")[0]
     return version, release
 
@@ -112,43 +112,53 @@ def main():
 
     setuppy_version, setuppy_release = get_setuppy_version(rootdir)
     package_version, package_release = get_package_version(rootdir)
-    confpy_version, confpy_release = get_setuppy_version(rootdir)
-    changelog_version, changelog_release = get_setuppy_version(rootdir)
+    confpy_version, confpy_release = get_sphinxconfpy_version(rootdir)
+    changelog_version, changelog_release = get_sphinxchangelog_version(rootdir)
 
     version_head = "Version"
     version_width = max(
-        [
-            len(version_head),
-            len(setuppy_version),
-            len(package_version),
-            len(confpy_version),
-            len(changelog_version),
-        ]
+        (
+            len(repr(x))
+            for x in (
+                version_head,
+                setuppy_version,
+                package_version,
+                confpy_version,
+                changelog_version,
+            )
+        )
     )
 
     release_head = "Release"
     release_width = max(
-        [
-            len(release_head),
-            len(setuppy_release),
-            len(package_release),
-            len(confpy_release),
-            len(changelog_release),
-        ]
+        (
+            len(repr(x))
+            for x in (
+                release_head,
+                setuppy_release,
+                package_release,
+                confpy_release,
+                changelog_release,
+            )
+        )
     )
 
     print(
         f"File                            {version_head} {release_head}\n"
         f"------------------------------- {'-' * version_width}"
         f" {'-' * release_width}\n"
-        f"setup.py                        {setuppy_version:>{version_width}}"
-        f" {setuppy_release:>{release_width}}\n"
-        f"sphinx_multiversion/__init__.py {package_version:>{version_width}}"
-        f" {package_release:>{release_width}}\n"
-        f"docs/conf.py                    {confpy_version:>{version_width}}"
-        f" {confpy_release:>{release_width}}\n"
-        f"docs/changelog.rst              {changelog_version:>{version_width}}"
-        f" {changelog_release:>{release_width}}\n"
+        f"setup.py                       "
+        f" {setuppy_version!r:>{version_width}}"
+        f" {setuppy_release!r:>{release_width}}\n"
+        f"sphinx_multiversion/__init__.py"
+        f" {package_version!r:>{version_width}}"
+        f" {package_release!r:>{release_width}}\n"
+        f"docs/conf.py                   "
+        f" {confpy_version!r:>{version_width}}"
+        f" {confpy_release!r:>{release_width}}\n"
+        f"docs/changelog.rst             "
+        f" {changelog_version!r:>{version_width}}"
+        f" {changelog_release!r:>{release_width}}\n"
     )
 
     assert setuppy_version == confpy_version
