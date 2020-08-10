@@ -1,9 +1,30 @@
-language: python
-python:
-- 3.6
-- 3.7
 os: linux
 dist: xenial
+language: python
+
+jobs:
+  include:
+    - name: "Ubuntu / Python 3.6"
+      python: 3.6
+    - name: "Ubuntu / Python 3.7"
+      python: 3.7
+    - name: "Windows / Python 3.6"
+      os: windows
+      language: shell
+      before_install:
+      - choco install python --version 3.6.8
+      env:
+      - PATH=/c/Python36:/c/Python36/Scripts:$PATH
+      - SKIP=check-executables-have-shebangs
+    - name: "Windows / Python 3.7"
+      os: windows
+      language: shell
+      before_install:
+      - choco install python --version 3.7.8
+      env:
+      - PATH=/c/Python37:/c/Python37/Scripts:$PATH
+      - SKIP=check-executables-have-shebangs
+
 cache:
   pip: true
 
@@ -22,8 +43,8 @@ script:
 
 # Deployment
 before_deploy:
-  - touch html/.nojekyll
-  - cp assets/gh-pages-redirect.html html/index.html
+- touch html/.nojekyll
+- cp assets/gh-pages-redirect.html html/index.html
 deploy:
   # Deploy documentation
 - provider: pages
@@ -35,6 +56,7 @@ deploy:
     branch: master
     repo: Holzhaus/sphinx-multiversion
     python: 3.7
+    os: linux
 
   # Deploy to PyPI
 - deploy:
@@ -48,6 +70,7 @@ deploy:
     branch: master
     repo: Holzhaus/sphinx-multiversion
     tags: true
+    os: linux
 
   # Deploy to Github Releases
 - provider: releases
@@ -65,3 +88,4 @@ deploy:
     repo: Holzhaus/sphinx-multiversion
     tags: true
     python: 3.7
+    os: linux
