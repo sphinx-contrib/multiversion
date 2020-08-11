@@ -30,7 +30,7 @@ jobs:
       - SKIP=check-executables-have-shebangs
     - name: "Ubuntu / Python 3.7"
       stage: Deployment
-      if: branch = master OR tag IS present
+      if: type != pull_request AND (branch = master OR tag IS present)
       python: 3.7
       before_deploy:
       - touch html/.nojekyll
