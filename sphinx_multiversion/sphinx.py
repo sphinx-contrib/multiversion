@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import datetime
 import json
-import pathlib
 import collections
 import logging
 import os
@@ -97,39 +96,39 @@ class VersionInfo:
                 posixpath.split(self.context["pagename"])[-1]
             )
 
-        # Find output root
+        # Find relative outputdir paths from common output root
         current_version = self.metadata[self.current_version_name]
         other_version = self.metadata[other_version_name]
-        outputroot = os.path.commonpath(
-            (current_version["outputdir"], other_version["outputdir"])
+
+        current_outputroot = os.path.abspath(current_version["outputdir"])
+        other_outputroot = os.path.abspath(other_version["outputdir"])
+        outputroot = os.path.commonpath((current_outputroot, other_outputroot))
+
+        current_outputroot = os.path.relpath(
+            current_outputroot, start=outputroot
         )
+        other_outputroot = os.path.relpath(other_outputroot, start=outputroot)
 
-        current_outputroot = pathlib.PurePath(
-            current_version["outputdir"]
-        ).relative_to(outputroot)
-        other_outputroot = pathlib.PurePath(
-            other_version["outputdir"]
-        ).relative_to(outputroot)
-
-        relative_path_to_outputroot = os.path.join(
-            *(
-                ".."
-                for x in current_outputroot.joinpath(
-                    self.context["pagename"]
-                ).parent.parts
+        # Ensure that we use POSIX separators in the path (for the HTML code)
+        if os.sep != posixpath.sep:
+            current_outputroot = posixpath.join(
+                *os.path.split(current_outputroot)
             )
-        )
+            other_outputroot = posixpath.join(*os.path.split(other_outputroot))
 
-        # Find output dir of other version
-        outputdir = posixpath.join(
-            relative_path_to_outputroot, other_outputroot
+        # Find relative path to root of other_version's outputdir
+        current_outputdir = posixpath.dirname(
+            posixpath.join(current_outputroot, self.context["pagename"])
+        )
+        other_outputdir = posixpath.relpath(
+            other_outputroot, start=current_outputdir
         )
 
         if not self.vhasdoc(other_version_name):
-            return posixpath.join(outputdir, "index.html")
+            return posixpath.join(other_outputdir, "index.html")
 
         return posixpath.join(
-            outputdir, "{}.html".format(self.context["pagename"])
+            other_outputdir, "{}.html".format(self.context["pagename"])
         )
 
 
