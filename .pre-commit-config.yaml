@@ -26,3 +26,16 @@ repos:
     files: ^(\.pre-commit/version_check\.py|setup\.py|sphinx_multiversion/__init__\.py|docs/conf\.py|docs/changelog\.rst)$
     additional_dependencies:
     - sphinx
+  - id: unittest
+    name: unittest
+    description: "Run unittests"
+    entry: python -m unittest discover
+    pass_filenames: false
+    language: python
+    types:
+    - python
+    stages:
+    - commit
+    - manual
+    additional_dependencies:
+    - sphinx
