@@ -91,6 +91,6 @@ before_script:
 script:
 - mkdir html
 - git fetch --all
-- sphinx-multiversion -W docs html
+- python -I -m sphinx_multiversion -W docs html
 - python setup.py build sdist bdist_wheel
 

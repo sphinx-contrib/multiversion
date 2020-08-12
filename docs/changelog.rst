@@ -15,7 +15,7 @@ Version 0.2.4 (unreleased)
 * Fix bug in the sphinx extension which tried to load the `conf.py` from the source directory instead of the conf directory. This could lead to problems when the two directories differ. (`#11 <issue11_>`_, `#13 <issue13_>`_)
 * Fix wrong import in :file:`__main__.py` that prevented invocation using ``python -m sphinx_multiversion``. (`#23 <issue23_>`_)
 * Fix failure to find refs if ``sphinx-multiversion`` was not invoked from the root of the git repository. (`#24 <issue24_>`_, `#25 <issue25_>`_, `#26 <issue26_>`_)
-* Resolve issues with Sphinx extensions and Python modules not being reloaded when parsing the different :file:`conf.py` files. Now, each config file is parsed in it's own process, and the build is performed using the ``subprocess`` module instead of doing it all from the context of the main module. (`#22 <issue22_>`_, `#28 <issue28_>`_, `#30 <issue30_>`_)
+* Resolve issues with Sphinx extensions and Python modules not being reloaded when parsing the different :file:`conf.py` files. Now, each config file is parsed in it's own process, and the build is performed using the ``subprocess`` module instead of doing it all from the context of the main module. Python's `interpreter flags <pythonflags_>`_ (e.g. isolated mode) are passed through to the subprocesses. (`#22 <issue22_>`_, `#28 <issue28_>`_, `#30 <issue30_>`_, `#36 <issue36_>`_)
 * Rewrite the path handling of the Sphinx extension to handle branch names containing a forward slash properly on Windows and add unittests and Windows CI builds to make sure it doesn't break on future updates. (`#31 <issue31_>`_, `#35 <issue35_>`_)
 
 
@@ -77,3 +77,5 @@ Version 0.1.0
 .. _issue30: https://github.com/Holzhaus/sphinx-multiversion/issues/30
 .. _issue31: https://github.com/Holzhaus/sphinx-multiversion/issues/31
 .. _issue35: https://github.com/Holzhaus/sphinx-multiversion/issues/35
+.. _issue36: https://github.com/Holzhaus/sphinx-multiversion/issues/36
+.. _pythonflags: https://docs.python.org/3/using/cmdline.html#miscellaneous-options
