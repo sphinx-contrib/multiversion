@@ -7,7 +7,7 @@ Changelog
 Version 0.2
 ===========
 
-Version 0.2.4 (unreleased)
+Version 0.2.4 (2020-08-12)
 --------------------------
 
 * Skip file existence check for the :file:`.` directory. This fixes an issue if the configuration or source directory is in the local path but reported as missing, because ``git cat-file -e`` always reports an error in that case. (`#12 <issue12_>`_)
