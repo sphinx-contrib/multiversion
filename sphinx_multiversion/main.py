@@ -284,7 +284,7 @@ def main(argv=None):
                 "outputdir": os.path.join(
                     os.path.abspath(args.outputdir), outputdir
                 ),
-                "confdir": confdir_absolute,
+                "confdir": confpath,
                 "docnames": list(project.discover()),
             }
 
@@ -320,7 +320,7 @@ def main(argv=None):
                     "-D",
                     "smv_current_version={}".format(version_name),
                     "-c",
-                    data["confdir"],
+                    confdir_absolute,
                     data["sourcedir"],
                     data["outputdir"],
                     *args.filenames,
