@@ -89,6 +89,36 @@ def load_sphinx_config(confpath, confoverrides, add_defaults=False):
     return result
 
 
+def get_python_flags():
+    if sys.flags.bytes_warning:
+        yield "-b"
+    if sys.flags.debug:
+        yield "-d"
+    if sys.flags.hash_randomization:
+        yield "-R"
+    if sys.flags.ignore_environment:
+        yield "-E"
+    if sys.flags.inspect:
+        yield "-i"
+    if sys.flags.isolated:
+        yield "-I"
+    if sys.flags.no_site:
+        yield "-S"
+    if sys.flags.no_user_site:
+        yield "-s"
+    if sys.flags.optimize:
+        yield "-O"
+    if sys.flags.quiet:
+        yield "-q"
+    if sys.flags.verbose:
+        yield "-v"
+    for option, value in sys._xoptions.items():
+        if value is True:
+            yield from ("-X", option)
+        else:
+            yield from ("-X", "{}={}".format(option, value))
+
+
 def main(argv=None):
     if not argv:
         argv = sys.argv[1:]
@@ -297,7 +327,13 @@ def main(argv=None):
                 ]
             )
             logger.debug("Running sphinx-build with args: %r", current_argv)
-            cmd = (sys.executable, "-m", "sphinx", *current_argv)
+            cmd = (
+                sys.executable,
+                *get_python_flags(),
+                "-m",
+                "sphinx",
+                *current_argv,
+            )
             current_cwd = os.path.join(data["basedir"], cwd_relative)
             subprocess.check_call(cmd, cwd=current_cwd)
 
