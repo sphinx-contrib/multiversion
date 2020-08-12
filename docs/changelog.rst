@@ -19,28 +19,28 @@ Version 0.2.4 (unreleased)
 * Rewrite the path handling of the Sphinx extension to handle branch names containing a forward slash properly on Windows and add unittests and Windows CI builds to make sure it doesn't break on future updates. (`#31 <issue31_>`_, `#35 <issue35_>`_)
 
 
-Version 0.2.3
--------------
+Version 0.2.3 (2020-05-04)
+--------------------------
 
 * Fixed return codes of main() function and exit with non-zero status if no matching refs were found.
 * Added some logging calls to the git module.
 * Fixed bug where local branch was used to check the existence of files on remote branches.
 
 
-Version 0.2.2
--------------
+Version 0.2.2 (2020-05-01)
+--------------------------
 
 * Added additional checks to determine if a branch or tag contains both the Sphinx source directory and the :file:`conf.py` file. If that's not the case, that branch or tag is skipped automatically and not copied to the temporary directory. (`#9 <issue9_>`_)
 
 
-Version 0.2.1
--------------
+Version 0.2.1 (2020-04-19)
+--------------------------
 
 * Fixed handling of absolute output paths in `vpathto` and ensure that all generated paths are relative.
 
 
-Version 0.2.0
--------------
+Version 0.2.0 (2020-04-19)
+--------------------------
 
 * Added a way to override config variables using placeholders that expand to each version's actual value (`#4 <issue4_>`_, `#7 <issue7_>`_).
 
@@ -48,14 +48,14 @@ Version 0.2.0
 Version 0.1
 ===========
 
-Version 0.1.1
--------------
+Version 0.1.1 (2020-03-12)
+--------------------------
 
 * Fixed version number in documentation
 * Fixed issue that caused the wrong configuration directory being used when the ``-c`` argument was not specified on the command line
 
-Version 0.1.0
--------------
+Version 0.1.0 (2020-03-11)
+--------------------------
 
 * Initial release
 
