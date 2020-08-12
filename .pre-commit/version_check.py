@@ -12,7 +12,7 @@ import docutils.parsers.rst
 import docutils.utils
 import docutils.frontend
 
-CHANGELOG_PATTERN = re.compile(r"^Version (\S+)((?: \(unreleased\)))?$")
+CHANGELOG_PATTERN = re.compile(r"^Version (\S+)((?: \(.+\)))?$")
 
 
 def parse_rst(text: str) -> docutils.nodes.document:
@@ -56,15 +56,15 @@ def get_sphinxchangelog_version(rootdir):
     matchobj = CHANGELOG_PATTERN.match(visitor.sectiontitles_found[1])
     assert matchobj
     version = matchobj.group(1)
-    version_unreleased = matchobj.group(2)
+    version_date = matchobj.group(2)
 
     matchobj = CHANGELOG_PATTERN.match(visitor.sectiontitles_found[2])
     assert matchobj
     release = matchobj.group(1)
-    release_unreleased = matchobj.group(2)
+    release_date = matchobj.group(2)
 
-    if version_unreleased:
-        assert release_unreleased
+    if version_date:
+        assert version_date == release_date
 
     return version, release
 
