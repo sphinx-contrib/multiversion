@@ -335,6 +335,17 @@ def main(argv=None):
                 *current_argv,
             )
             current_cwd = os.path.join(data["basedir"], cwd_relative)
-            subprocess.check_call(cmd, cwd=current_cwd)
+            env = os.environ.copy()
+            env.update(
+                {
+                    "SPHINX_MULTIVERSION_NAME": data["name"],
+                    "SPHINX_MULTIVERSION_VERSION": data["version"],
+                    "SPHINX_MULTIVERSION_RELEASE": data["release"],
+                    "SPHINX_MULTIVERSION_SOURCEDIR": data["sourcedir"],
+                    "SPHINX_MULTIVERSION_OUTPUTDIR": data["outputdir"],
+                    "SPHINX_MULTIVERSION_CONFDIR": data["confdir"],
+                }
+            )
+            subprocess.check_call(cmd, cwd=current_cwd, env=env)
 
     return 0
