@@ -12,6 +12,7 @@ import string
 import subprocess
 import sys
 import tempfile
+import shlex
 
 from sphinx import config as sphinx_config
 from sphinx import project as sphinx_project
@@ -159,6 +160,12 @@ def main(argv=None):
         action="store_true",
         help="dump generated metadata and exit",
     )
+    parser.add_argument(
+        "--pre-build",
+        action="append",
+        default=[],
+        help="a list of commands to run before running sphinx-build",
+    )
     args, argv = parser.parse_known_args(argv)
     if args.noconfig:
         return 1
@@ -183,6 +190,9 @@ def main(argv=None):
         confdir_absolute, confoverrides, add_defaults=True
     )
 
+    # Parse pre build commands
+    pre_build_commands = [shlex.split(command) for command in args.pre_build]
+    
     # Get relative paths to root of git repository
     gitroot = pathlib.Path(
         git.get_toplevel_path(cwd=sourcedir_absolute)
@@ -346,6 +356,12 @@ def main(argv=None):
                     "SPHINX_MULTIVERSION_CONFDIR": data["confdir"],
                 }
             )
+            
+            if pre_build_commands:
+                logger.debug("Running pre build commands:")
+                for command in pre_build_commands:
+                    subprocess.check_call(command, cwd=current_cwd, env=env)
+            
             subprocess.check_call(cmd, cwd=current_cwd, env=env)
 
     return 0

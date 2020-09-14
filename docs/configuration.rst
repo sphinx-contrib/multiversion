@@ -130,6 +130,28 @@ Here's an example for the `exhale extension <exhale_>`_:
 
     To see a list of available placeholder names and their values for each version you can use the ``--dump-metadata`` flag.
 
+Running Commands Before Building
+================================
+
+You can run commands before each version of the documentation is build with the option ``--pre-build``.
+
+This could be useful to prepare the docs repository before running ``sphinx-build``, debug the execution, or even generate versioned documentation using other builders.
+
+For example, imagine that you want to build versioned docs written in Sphinx, but the API reference is generated with JavaDoc. This option enables the generation of both versioned docs to host them under the same folder using GitHub Pages.
+
+Here's an example showing the directory where the build command is running:
+
+.. code-block:: python
+
+    sphinx-multiversion docs build/html --pre-build pwd
+
+
+You can pass multiple commands adding extra ``--pre-build`` tags. The commands run in order, from left to right:
+
+.. code-block:: python
+
+    sphinx-multiversion docs build/html --pre-build pwd --pre-build ls
+
 .. _python_regex: https://docs.python.org/3/howto/regex.html
 .. _python_format: https://pyformat.info/
 .. _exhale: https://exhale.readthedocs.io/en/latest/
