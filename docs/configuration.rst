@@ -133,7 +133,7 @@ Here's an example for the `exhale extension <exhale_>`_:
 Running Commands Before Building
 ================================
 
-You can run commands before each version of the documentation is build with the option ``--pre-build``.
+You can run commands before each version of the documentation is built with the option ``--pre-build``.
 
 This could be useful to prepare the docs repository before running ``sphinx-build``, debug the execution, or even generate versioned documentation using other builders.
 
@@ -146,7 +146,7 @@ Here's an example showing the directory where the build command is running:
     sphinx-multiversion docs build/html --pre-build pwd
 
 
-You can pass multiple commands adding extra ``--pre-build`` tags. The commands run in order, from left to right:
+You can pass multiple commands by adding extra ``--pre-build`` tags. The commands run in order, from left to right:
 
 .. code-block:: python
 
