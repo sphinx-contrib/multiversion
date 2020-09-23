@@ -274,6 +274,7 @@ def main(argv=None):
                 "name": gitref.name,
                 "version": current_config.version,
                 "release": current_config.release,
+                "rst_prolog": current_config.rst_prolog,
                 "is_released": bool(
                     re.match(config.smv_released_pattern, gitref.refname)
                 ),
