@@ -20,7 +20,14 @@ DEFAULT_RELEASED_PATTERN = r"^tags/.*$"
 DEFAULT_OUTPUTDIR_FORMAT = r"{ref.name}"
 
 Version = collections.namedtuple(
-    "Version", ["name", "url", "version", "release", "is_released",]
+    "Version",
+    [
+        "name",
+        "url",
+        "version",
+        "release",
+        "is_released",
+    ],
 )
 
 
