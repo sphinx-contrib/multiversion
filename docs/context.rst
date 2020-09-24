@@ -151,7 +151,7 @@ Other Variables
 
     .. code-block:: jinja
 
-        <h3>Latest Version: {{ current_version.name }}</h3>
+        <h3>Latest Version: {{ latest_version.name }}</h3>
 
 
 .. _sphinx_context: http://www.sphinx-doc.org/en/stable/config.html?highlight=context#confval-html_context
