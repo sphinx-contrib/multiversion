@@ -84,11 +84,11 @@ List releases and development versions separately
 Version Banners
 ===============
 
-You can also add version banners to your theme, for example:
+You can also add version banners to your theme, for example create a template file page.html in the templates directory:
 
 .. code-block:: html
 
-    {% extends "page.html" %}
+    {% extends "!page.html" %}
     {% block body %}
     {% if current_version and latest_version and current_version != latest_version %}
     <p>
@@ -100,7 +100,7 @@ You can also add version banners to your theme, for example:
         You're reading the documentation for a development version.
         For the latest released version, please have a look at <a href="{{ vpathto(latest_version.name) }}">{{latest_version.name}}</a>.
         {% endif %}
-      <strong>
+      </strong>
     </p>
     {% endif %}
     {{ super() }}
