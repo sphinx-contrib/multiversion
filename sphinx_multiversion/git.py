@@ -10,7 +10,14 @@ import tempfile
 
 GitRef = collections.namedtuple(
     "VersionRef",
-    ["name", "commit", "source", "is_remote", "refname", "creatordate",],
+    [
+        "name",
+        "commit",
+        "source",
+        "is_remote",
+        "refname",
+        "creatordate",
+    ],
 )
 
 logger = logging.getLogger(__name__)

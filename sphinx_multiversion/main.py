@@ -34,7 +34,8 @@ def load_sphinx_config_worker(q, confpath, confoverrides, add_defaults):
     try:
         with working_dir(confpath):
             current_config = sphinx_config.Config.read(
-                confpath, confoverrides,
+                confpath,
+                confoverrides,
             )
 
         if add_defaults:
@@ -250,7 +251,8 @@ def main(argv=None):
 
             # Ensure that there are not duplicate output dirs
             outputdir = config.smv_outputdir_format.format(
-                ref=gitref, config=current_config,
+                ref=gitref,
+                config=current_config,
             )
             if outputdir in outputdirs:
                 logger.warning(
