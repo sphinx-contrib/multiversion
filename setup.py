@@ -25,6 +25,8 @@ setup(
     license="BSD",
     packages=["sphinx_multiversion"],
     entry_points={
-        "console_scripts": ["sphinx-multiversion=sphinx_multiversion:main",],
+        "console_scripts": [
+            "sphinx-multiversion=sphinx_multiversion:main",
+        ],
     },
 )
