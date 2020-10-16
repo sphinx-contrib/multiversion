@@ -59,9 +59,11 @@ Assuming that you're using a theme with sidebar widget support, you just need to
         "_templates",
     ]
 
-    html_sidebars = [
-        "versioning.html",
-    ]
+    html_sidebars = {
+        '**': [
+            'versioning.html',
+        ],
+    }
 
 Now rebuild the documentation:
 
