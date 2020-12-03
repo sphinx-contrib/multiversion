@@ -160,6 +160,9 @@ def main(argv=None):
         action="store_true",
         help="dump generated metadata and exit",
     )
+    parser.add_argument(
+        "--only", type=str, nargs="+", help="only build these versions / branches"
+    )
     args, argv = parser.parse_known_args(argv)
     if args.noconfig:
         return 1
@@ -306,6 +309,10 @@ def main(argv=None):
         # Run Sphinx
         argv.extend(["-D", "smv_metadata_path={}".format(metadata_path)])
         for version_name, data in metadata.items():
+            if args.only and version_name not in args.only:
+                logging.warning(f"skipping {version_name} due to --only")
+                continue
+
             os.makedirs(data["outputdir"], exist_ok=True)
 
             defines = itertools.chain(
