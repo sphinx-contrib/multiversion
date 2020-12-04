@@ -161,8 +161,11 @@ def main(argv=None):
         help="dump generated metadata and exit",
     )
     parser.add_argument(
-        "--only", type=str, nargs="+", help="only build these versions / branches",
-        metavar="tag/branch"
+        "--only",
+        type=str,
+        nargs="+",
+        help="only build these versions / branches",
+        metavar="tag/branch",
     )
     parser.add_argument(
         "--log-level",
