@@ -105,6 +105,34 @@ Here are some examples:
 
     Have a look at `PyFormat <python_format_>`_ for information how to use new-stye Python formatting.
 
+.. _speed builds:
+
+Speed Up Builds
+===============
+
+By default all tags and branches matched by smv_tag_whitelist and smv_branch_whitelist
+are rebuilt from scratch. This means that CI will take longer as more versions of your
+source are tagged.
+
+The command line option `--only` allows you to list the branch names and tag names that
+you wish to build. Links to all versions in and smv_tag_whitelist smv_branch_whitelist are
+always included in the generated sidebar and these are assumed to have been previously built.
+
+e.g.
+
+.. code-block:: bash
+
+    sphinx-multiversion docs build/html --only v0.1.0 master
+
+Thus if you whitelist master and all released tags you can configure CI to only build
+the reference in the current commit.
+
+This will result in a set of documentation pages that have links to master and to
+previous releases. There will be no links to future versions in historical documentation
+pages, but this is acceptable.
+
+See :ref:`Github Actions<github-actions>` for example usage.
+
 
 Overriding Configuration Variables
 ==================================
