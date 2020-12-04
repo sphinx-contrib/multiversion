@@ -116,6 +116,8 @@ Add the following to your `.github/workflows/build.yml`:
                 uses: actions/checkout@v2.3.1
                 with:
                 persist-credentials: false
+                # require all of history to see all tagged versions' docs
+                fetch-depth: 0
 
             - name: Set up Python 3.7
                 uses: actions/setup-python@v2
