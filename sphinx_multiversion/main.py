@@ -161,13 +161,6 @@ def main(argv=None):
         help="dump generated metadata and exit",
     )
     parser.add_argument(
-        "--only",
-        type=str,
-        nargs="+",
-        help="only build these versions / branches",
-        metavar="tag/branch",
-    )
-    parser.add_argument(
         "--log-level",
         help="Set log level. Options: error, warning, info, debug.",
         default="warning",
@@ -324,8 +317,11 @@ def main(argv=None):
         argv.extend(["-D", "smv_metadata_path={}".format(metadata_path)])
         for version_name, data in metadata.items():
 
-            if args.only and version_name not in args.only:
-                logger.warning(f"skipping {version_name} due to --only")
+            if (
+                data["source"] == "tags"
+                and pathlib.Path(data["outputdir"]).exists()
+            ):
+                logger.warning(f"skipping {version_name} - it already exists")
                 continue
             else:
                 logger.info(f"building {version_name} ...")
