@@ -94,6 +94,7 @@ def load_sphinx_config_worker(q, confpath, confoverrides, add_defaults):
             )
             current_config.add("smv_prefer_remote_refs", False, "html", bool)
             current_config.add("smv_prebuild_command", "", "html", str)
+            current_config.add("smv_postbuild_command", "", "html", str)
         current_config.pre_init_values()
         current_config.init_values()
     except Exception as err:
@@ -386,5 +387,14 @@ def main(argv=None):
                 }
             )
             subprocess.check_call(cmd, cwd=current_cwd, env=env)
+
+            if config.smv_postbuild_command != "":
+                logger.debug(
+                    "Running postbuild command: %r",
+                    config.smv_postbuild_command,
+                )
+                subprocess.check_call(
+                    config.smv_postbuild_command, cwd=current_cwd, shell=True
+                )
 
     return 0
