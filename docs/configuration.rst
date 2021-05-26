@@ -103,7 +103,7 @@ Here are some examples:
 
 .. seealso::
 
-    Have a look at `PyFormat <python_format_>`_ for information how to use new-stye Python formatting.
+    Have a look at `PyFormat <python_format_>`_ for information how to use new-style Python formatting.
 
 
 Overriding Configuration Variables
