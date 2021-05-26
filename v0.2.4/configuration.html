@@ -1,0 +1,273 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Configuration &#8212; sphinx-multiversion 0.2.4 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Templates" href="templates.html" />
+    <link rel="prev" title="Quickstart" href="quickstart.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="configuration">
+<span id="id1"></span><h1>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h1>
+<p><code class="docutils literal notranslate"><span class="pre">sphinx-multiversion</span></code> reads your Sphinx <code class="file docutils literal notranslate"><span class="pre">conf.py</span></code> file for configuration.
+As usual, you can also override certain options by using <code class="docutils literal notranslate"><span class="pre">-D</span> <span class="pre">var=value</span></code> on the command line.</p>
+<p>This is what the default configuration looks like:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Whitelist pattern for tags (set to None to ignore all tags)</span>
+<span class="n">smv_tag_whitelist</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;^.*$&#39;</span>
+
+<span class="c1"># Whitelist pattern for branches (set to None to ignore all branches)</span>
+<span class="n">smv_branch_whitelist</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;^.*$&#39;</span>
+
+<span class="c1"># Whitelist pattern for remotes (set to None to use local branches only)</span>
+<span class="n">smv_remote_whitelist</span> <span class="o">=</span> <span class="kc">None</span>
+
+<span class="c1"># Pattern for released versions</span>
+<span class="n">smv_released_pattern</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;^tags/.*$&#39;</span>
+
+<span class="c1"># Format for versioned output directories inside the build directory</span>
+<span class="n">smv_outputdir_format</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{ref.name}</span><span class="s1">&#39;</span>
+
+<span class="c1"># Determines whether remote or local git branches/tags are preferred if their output dirs conflict</span>
+<span class="n">smv_prefer_remote_refs</span> <span class="o">=</span> <span class="kc">False</span>
+</pre></div>
+</div>
+<p>You can override all of these values inside your <code class="file docutils literal notranslate"><span class="pre">conf.py</span></code>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>You can check which tags/branches are matched by running <code class="docutils literal notranslate"><span class="pre">sphinx-multiversion</span></code> with the <code class="docutils literal notranslate"><span class="pre">--dump-metadata</span></code> flag. Branches or tags that don’t contain both the sphinx source directory and the <code class="file docutils literal notranslate"><span class="pre">conf.py</span></code> file will be skipped automatically.</p>
+</div>
+<section id="tag-branch-remote-whitelists">
+<h2>Tag/Branch/Remote whitelists<a class="headerlink" href="#tag-branch-remote-whitelists" title="Permalink to this headline">¶</a></h2>
+<p>Tags, Branches and Remotes are included by <a class="reference external" href="https://docs.python.org/3/howto/regex.html">Regular Expressions</a>.
+Here are some examples:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">smv_tag_whitelist</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;^.*$&#39;</span>                   <span class="c1"># Include all tags</span>
+<span class="n">smv_tag_whitelist</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;^v\d+\.\d+$&#39;</span>            <span class="c1"># Include tags like &quot;v2.1&quot;</span>
+
+<span class="n">smv_branch_whitelist</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;^.*$&#39;</span>                <span class="c1"># Include all branches</span>
+<span class="n">smv_branch_whitelist</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;^(?!master).*$&#39;</span>      <span class="c1"># Include all branches except &quot;master&quot;</span>
+
+<span class="n">smv_remote_whitelist</span> <span class="o">=</span> <span class="kc">None</span>                   <span class="c1"># Only use local branches</span>
+<span class="n">smv_remote_whitelist</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;^.*$&#39;</span>                <span class="c1"># Use branches from all remotes</span>
+<span class="n">smv_remote_whitelist</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;^(origin|upstream)$&#39;</span> <span class="c1"># Use branches from origin and upstream</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>To list values to match, you can use <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">branch</span></code>, <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">tag</span></code> and <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">remote</span></code>.</p>
+</div>
+</section>
+<section id="release-pattern">
+<h2>Release Pattern<a class="headerlink" href="#release-pattern" title="Permalink to this headline">¶</a></h2>
+<p>A Regular Expression is used to determine if a version of the documentation has been released or if it’s a development version.
+To allow more flexibility, the regex is evaluated over the full refname.</p>
+<p>Here are some examples:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">smv_released_pattern</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;^tags/.*$&#39;</span>           <span class="c1"># Tags only</span>
+<span class="n">smv_released_pattern</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;^heads/\d+\.\d+$&#39;</span>    <span class="c1"># Branches like &quot;2.1&quot;</span>
+<span class="n">smv_released_pattern</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;^(tags/.*|heads/\d+\.\d+)$&#39;</span>           <span class="c1"># Branches like &quot;2.1&quot; and all tags</span>
+<span class="n">smv_released_pattern</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;^(heads|remotes/[^/]+)/(?!:master).*$&#39;</span> <span class="c1"># Everything except master branch</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>To list all refnames , you can use:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git <span class="k">for</span>-each-ref --format <span class="s2">&quot;%(refname)&quot;</span> <span class="p">|</span> sed <span class="s1">&#39;s/^refs\///g&#39;</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="output-directory-format">
+<h2>Output Directory Format<a class="headerlink" href="#output-directory-format" title="Permalink to this headline">¶</a></h2>
+<p>Each version will be built into a seperate subdirectory of the Sphinx output directory.
+The <code class="docutils literal notranslate"><span class="pre">smv_outputdir_format</span></code> setting determines the directory structure for the subdirectories. It is a new-style Python formatting string with two parameters - <code class="docutils literal notranslate"><span class="pre">ref</span></code> and <code class="docutils literal notranslate"><span class="pre">config</span></code>.</p>
+<p>Here are some examples:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">smv_outputdir_format</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{ref.name}</span><span class="s1">&#39;</span>        <span class="c1"># Use the branch/tag name</span>
+<span class="n">smv_outputdir_format</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{ref.commit}</span><span class="s1">&#39;</span>      <span class="c1"># Use the commit hash</span>
+<span class="n">smv_outputdir_format</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{ref.commit:.7s}</span><span class="s1">&#39;</span>  <span class="c1"># Use the commit hash truncated to 7 characters</span>
+<span class="n">smv_outputdir_format</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{ref.refname}</span><span class="s1">&#39;</span>     <span class="c1"># Use the full refname</span>
+<span class="n">smv_outputdir_format</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{ref.source}</span><span class="s1">/</span><span class="si">{ref.name}</span><span class="s1">&#39;</span>      <span class="c1"># Equivalent to the previous example</span>
+<span class="n">smv_outputdir_format</span> <span class="o">=</span> <span class="s1">&#39;versions/</span><span class="si">{config.release}</span><span class="s1">&#39;</span>    <span class="c1"># Use &quot;versions&quot; as parent directory and the &quot;release&quot; variable from conf.py</span>
+<span class="n">smv_outputdir_format</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{config.version}</span><span class="s1">/</span><span class="si">{ref.name}</span><span class="s1">&#39;</span>  <span class="c1"># Use the version from conf.py as parent directory and the branch/tag name as subdirectory</span>
+</pre></div>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p>Have a look at <a class="reference external" href="https://pyformat.info/">PyFormat</a> for information how to use new-stye Python formatting.</p>
+</div>
+</section>
+<section id="overriding-configuration-variables">
+<h2>Overriding Configuration Variables<a class="headerlink" href="#overriding-configuration-variables" title="Permalink to this headline">¶</a></h2>
+<p>You can override configuration variables the same way as you’re used to with <code class="docutils literal notranslate"><span class="pre">sphinx-build</span></code>.</p>
+<p>Since <code class="docutils literal notranslate"><span class="pre">sphinx-multiversion</span></code> copies the branch data into a temporary directory and builds them there while leaving the current working directory unchanged, relative paths in your <code class="file docutils literal notranslate"><span class="pre">conf.py</span></code> will refer to the path of the version <em>you’re building from</em>, not the path of the version you are trying to build documentation for.</p>
+<p>Sometimes it might be necessary to override the configured path via a command line overide.
+<code class="docutils literal notranslate"><span class="pre">sphinx-multiversion</span></code> allows you to insert placeholders into your override strings that will automatically be replaced with the correct value for the version you’re building the documentation for.</p>
+<p>Here’s an example for the <a class="reference external" href="https://exhale.readthedocs.io/en/latest/">exhale extension</a>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">sphinx</span><span class="o">-</span><span class="n">multiversion</span> <span class="n">docs</span> <span class="n">build</span><span class="o">/</span><span class="n">html</span> <span class="o">-</span><span class="n">D</span> <span class="s1">&#39;exhale_args.containmentFolder=$</span><span class="si">{sourcedir}</span><span class="s1">/api&#39;</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Make sure to enclose the override string in single quotes (<code class="docutils literal notranslate"><span class="pre">'</span></code>) to prevent the shell from treating it as an environment variable and replacing it before it’s passed to <code class="docutils literal notranslate"><span class="pre">sphinx-multiversion</span></code>.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>To see a list of available placeholder names and their values for each version you can use the <code class="docutils literal notranslate"><span class="pre">--dump-metadata</span></code> flag.</p>
+</div>
+</section>
+</section>
+
+
+          </div>
+              <div class="related bottom">
+                &nbsp;
+  <nav id="rellinks">
+    <ul>
+        <li>
+          &larr;
+          <a href="quickstart.html" title="Previous document">Quickstart</a>
+        </li>
+        <li>
+          <a href="templates.html" title="Next document">Templates</a>
+          &rarr;
+        </li>
+    </ul>
+  </nav>
+              </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">sphinx-multiversion</a></h1>
+
+
+
+
+
+
+<p>
+<iframe src="https://ghbtns.com/github-btn.html?user=Holzhaus&repo=sphinx-multiversion&type=watch&count=true&size=large&v=2"
+  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
+</p>
+
+
+
+
+
+    
+
+<p>
+<a class="badge" href="https://travis-ci.org/Holzhaus/sphinx-multiversion">
+    <img
+        alt="https://secure.travis-ci.org/Holzhaus/sphinx-multiversion.svg?branch=master"
+        src="https://secure.travis-ci.org/Holzhaus/sphinx-multiversion.svg?branch=master"
+    />
+</a>
+</p>
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">General</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Configuration</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#tag-branch-remote-whitelists">Tag/Branch/Remote whitelists</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#release-pattern">Release Pattern</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#output-directory-format">Output Directory Format</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#overriding-configuration-variables">Overriding Configuration Variables</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="templates.html">Templates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="context.html">HTML Context</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Appendix</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="github_pages.html">Hosting on GitHub Pages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="faq.html">Frequently Asked Questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="quickstart.html" title="previous chapter">Quickstart</a></li>
+      <li>Next: <a href="templates.html" title="next chapter">Templates</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<h3>Branches</h3>
+<ul>
+  <li><a href="../master/configuration.html">master</a></li>
+</ul>
+<h3>Tags</h3>
+<ul>
+  <li><a href="../v0.1.1/configuration.html">v0.1.1</a></li>
+  <li><a href="../v0.2.0/configuration.html">v0.2.0</a></li>
+  <li><a href="../v0.2.1/configuration.html">v0.2.1</a></li>
+  <li><a href="../v0.2.2/configuration.html">v0.2.2</a></li>
+  <li><a href="../v0.2.3/configuration.html">v0.2.3</a></li>
+  <li><a href="configuration.html">v0.2.4</a></li>
+</ul>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2021, Jan Holthuis.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.0.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/configuration.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+    <a href="https://github.com/Holzhaus/sphinx-multiversion" class="github">
+        <img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub"  class="github"/>
+    </a>
+    
+
+    
+  </body>
+</html>

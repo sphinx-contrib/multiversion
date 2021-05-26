@@ -1,0 +1,297 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Templates &#8212; sphinx-multiversion 0.2.2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="HTML Context" href="context.html" />
+    <link rel="prev" title="Configuration" href="configuration.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="templates">
+<span id="id1"></span><h1>Templates<a class="headerlink" href="#templates" title="Permalink to this headline">¶</a></h1>
+<p><code class="docutils literal notranslate"><span class="pre">sphinx-multiversion</span></code> does not change the look of your HTML output by default.
+Instead, you can customize the template to cater to your needs.</p>
+<section id="version-listings">
+<h2>Version Listings<a class="headerlink" href="#version-listings" title="Permalink to this headline">¶</a></h2>
+<p>To add version listings to your template, you need to add a custom template to your theme.</p>
+<p>You can take one of the snippets below, put it into <code class="file docutils literal notranslate"><span class="pre">_templates/versioning.html</span></code> and add it to your theme’s sidebar:</p>
+<div class="highlight-html notranslate"><div class="highlight"><pre><span></span>templates_path = [
+    &quot;_templates&quot;,
+]
+
+html_sidebars = [
+    &quot;versioning.html&quot;,
+]
+</pre></div>
+</div>
+<section id="list-all-branches-tags">
+<h3>List all branches/tags<a class="headerlink" href="#list-all-branches-tags" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-html notranslate"><div class="highlight"><pre><span></span>{% if versions %}
+<span class="p">&lt;</span><span class="nt">h3</span><span class="p">&gt;</span>{{ _(&#39;Versions&#39;) }}<span class="p">&lt;/</span><span class="nt">h3</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">ul</span><span class="p">&gt;</span>
+  {%- for item in versions %}
+  <span class="p">&lt;</span><span class="nt">li</span><span class="p">&gt;&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">&quot;{{ item.url }}&quot;</span><span class="p">&gt;</span>{{ item.name }}<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;&lt;/</span><span class="nt">li</span><span class="p">&gt;</span>
+  {%- endfor %}
+<span class="p">&lt;/</span><span class="nt">ul</span><span class="p">&gt;</span>
+{% endif %}
+</pre></div>
+</div>
+</section>
+<section id="list-branches-and-tags-separately">
+<h3>List branches and tags separately<a class="headerlink" href="#list-branches-and-tags-separately" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-html notranslate"><div class="highlight"><pre><span></span>{% if versions %}
+<span class="p">&lt;</span><span class="nt">h3</span><span class="p">&gt;</span>{{ _(&#39;Branches&#39;) }}<span class="p">&lt;/</span><span class="nt">h3</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">ul</span><span class="p">&gt;</span>
+  {%- for item in versions.branches %}
+  <span class="p">&lt;</span><span class="nt">li</span><span class="p">&gt;&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">&quot;{{ item.url }}&quot;</span><span class="p">&gt;</span>{{ item.name }}<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;&lt;/</span><span class="nt">li</span><span class="p">&gt;</span>
+  {%- endfor %}
+<span class="p">&lt;/</span><span class="nt">ul</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">h3</span><span class="p">&gt;</span>{{ _(&#39;Tags&#39;) }}<span class="p">&lt;/</span><span class="nt">h3</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">ul</span><span class="p">&gt;</span>
+  {%- for item in versions.tags %}
+  <span class="p">&lt;</span><span class="nt">li</span><span class="p">&gt;&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">&quot;{{ item.url }}&quot;</span><span class="p">&gt;</span>{{ item.name }}<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;&lt;/</span><span class="nt">li</span><span class="p">&gt;</span>
+  {%- endfor %}
+<span class="p">&lt;/</span><span class="nt">ul</span><span class="p">&gt;</span>
+{% endif %}
+</pre></div>
+</div>
+</section>
+<section id="list-releases-and-development-versions-separately">
+<h3>List releases and development versions separately<a class="headerlink" href="#list-releases-and-development-versions-separately" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-html notranslate"><div class="highlight"><pre><span></span>{% if versions %}
+<span class="p">&lt;</span><span class="nt">h3</span><span class="p">&gt;</span>{{ _(&#39;Releases&#39;) }}<span class="p">&lt;/</span><span class="nt">h3</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">ul</span><span class="p">&gt;</span>
+  {%- for item in versions.releases %}
+  <span class="p">&lt;</span><span class="nt">li</span><span class="p">&gt;&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">&quot;{{ item.url }}&quot;</span><span class="p">&gt;</span>{{ item.name }}<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;&lt;/</span><span class="nt">li</span><span class="p">&gt;</span>
+  {%- endfor %}
+<span class="p">&lt;/</span><span class="nt">ul</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">h3</span><span class="p">&gt;</span>{{ _(&#39;In Development&#39;) }}<span class="p">&lt;/</span><span class="nt">h3</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">ul</span><span class="p">&gt;</span>
+  {%- for item in versions.in_development %}
+  <span class="p">&lt;</span><span class="nt">li</span><span class="p">&gt;&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">&quot;{{ item.url }}&quot;</span><span class="p">&gt;</span>{{ item.name }}<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;&lt;/</span><span class="nt">li</span><span class="p">&gt;</span>
+  {%- endfor %}
+<span class="p">&lt;/</span><span class="nt">ul</span><span class="p">&gt;</span>
+{% endif %}
+</pre></div>
+</div>
+</section>
+</section>
+<section id="version-banners">
+<h2>Version Banners<a class="headerlink" href="#version-banners" title="Permalink to this headline">¶</a></h2>
+<p>You can also add version banners to your theme, for example:</p>
+<div class="highlight-html notranslate"><div class="highlight"><pre><span></span>{% extends &quot;page.html&quot; %}
+{% block body %}
+{% if current_version and latest_version and current_version != latest_version %}
+<span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">strong</span><span class="p">&gt;</span>
+    {% if current_version.is_released %}
+    You&#39;re reading an old version of this documentation.
+    If you want up-to-date information, please have a look at <span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">&quot;{{ vpathto(latest_version.name) }}&quot;</span><span class="p">&gt;</span>{{latest_version.name}}<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>.
+    {% else %}
+    You&#39;re reading the documentation for a development version.
+    For the latest released version, please have a look at <span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">&quot;{{ vpathto(latest_version.name) }}&quot;</span><span class="p">&gt;</span>{{latest_version.name}}<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>.
+    {% endif %}
+  <span class="p">&lt;</span><span class="nt">strong</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+{% endif %}
+{{ super() }}
+{% endblock %}%
+</pre></div>
+</div>
+</section>
+<section id="readthedocs-theme">
+<h2>ReadTheDocs Theme<a class="headerlink" href="#readthedocs-theme" title="Permalink to this headline">¶</a></h2>
+<p>As of version 0.4.3, the <a class="reference external" href="https://pypi.org/project/sphinx-rtd-theme/">Read the Docs theme</a> does not support sidebar widgets.
+So instead of adding a custom template to <code class="docutils literal notranslate"><span class="pre">html_sidebars</span></code>, you need to create a template file named <code class="file docutils literal notranslate"><span class="pre">versions.html</span></code> with the following content:</p>
+<div class="highlight-html notranslate"><div class="highlight"><pre><span></span>{%- if current_version %}
+<span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;rst-versions&quot;</span> <span class="na">data-toggle</span><span class="o">=</span><span class="s">&quot;rst-versions&quot;</span> <span class="na">role</span><span class="o">=</span><span class="s">&quot;note&quot;</span> <span class="na">aria-label</span><span class="o">=</span><span class="s">&quot;versions&quot;</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">span</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;rst-current-version&quot;</span> <span class="na">data-toggle</span><span class="o">=</span><span class="s">&quot;rst-current-version&quot;</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">span</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;fa fa-book&quot;</span><span class="p">&gt;</span> Other Versions<span class="p">&lt;/</span><span class="nt">span</span><span class="p">&gt;</span>
+    v: {{ current_version.name }}
+    <span class="p">&lt;</span><span class="nt">span</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;fa fa-caret-down&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">span</span><span class="p">&gt;</span>
+  <span class="p">&lt;/</span><span class="nt">span</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;rst-other-versions&quot;</span><span class="p">&gt;</span>
+    {%- if versions.tags %}
+    <span class="p">&lt;</span><span class="nt">dl</span><span class="p">&gt;</span>
+      <span class="p">&lt;</span><span class="nt">dt</span><span class="p">&gt;</span>Tags<span class="p">&lt;/</span><span class="nt">dt</span><span class="p">&gt;</span>
+      {%- for item in versions.tags %}
+      <span class="p">&lt;</span><span class="nt">dd</span><span class="p">&gt;&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">&quot;{{ item.url }}&quot;</span><span class="p">&gt;</span>{{ item.name }}<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;&lt;/</span><span class="nt">dd</span><span class="p">&gt;</span>
+      {%- endfor %}
+    <span class="p">&lt;/</span><span class="nt">dl</span><span class="p">&gt;</span>
+    {%- endif %}
+    {%- if versions.branches %}
+    <span class="p">&lt;</span><span class="nt">dl</span><span class="p">&gt;</span>
+      <span class="p">&lt;</span><span class="nt">dt</span><span class="p">&gt;</span>Branches<span class="p">&lt;/</span><span class="nt">dt</span><span class="p">&gt;</span>
+      {%- for item in versions.branches %}
+      <span class="p">&lt;</span><span class="nt">dd</span><span class="p">&gt;&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">&quot;{{ item.url }}&quot;</span><span class="p">&gt;</span>{{ item.name }}<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;&lt;/</span><span class="nt">dd</span><span class="p">&gt;</span>
+      {%- endfor %}
+    <span class="p">&lt;/</span><span class="nt">dl</span><span class="p">&gt;</span>
+    {%- endif %}
+  <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+{%- endif %}
+</pre></div>
+</div>
+</section>
+</section>
+
+
+          </div>
+              <div class="related bottom">
+                &nbsp;
+  <nav id="rellinks">
+    <ul>
+        <li>
+          &larr;
+          <a href="configuration.html" title="Previous document">Configuration</a>
+        </li>
+        <li>
+          <a href="context.html" title="Next document">HTML Context</a>
+          &rarr;
+        </li>
+    </ul>
+  </nav>
+              </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">sphinx-multiversion</a></h1>
+
+
+
+
+
+
+<p>
+<iframe src="https://ghbtns.com/github-btn.html?user=Holzhaus&repo=sphinx-multiversion&type=watch&count=true&size=large&v=2"
+  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
+</p>
+
+
+
+
+
+    
+
+<p>
+<a class="badge" href="https://travis-ci.org/Holzhaus/sphinx-multiversion">
+    <img
+        alt="https://secure.travis-ci.org/Holzhaus/sphinx-multiversion.svg?branch=master"
+        src="https://secure.travis-ci.org/Holzhaus/sphinx-multiversion.svg?branch=master"
+    />
+</a>
+</p>
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">General</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Templates</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#version-listings">Version Listings</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#list-all-branches-tags">List all branches/tags</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#list-branches-and-tags-separately">List branches and tags separately</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#list-releases-and-development-versions-separately">List releases and development versions separately</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#version-banners">Version Banners</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#readthedocs-theme">ReadTheDocs Theme</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="context.html">HTML Context</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Appendix</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="github_pages.html">Hosting on GitHub Pages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="faq.html">Frequently Asked Questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="configuration.html" title="previous chapter">Configuration</a></li>
+      <li>Next: <a href="context.html" title="next chapter">HTML Context</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+<h3>Branches</h3>
+<ul>
+  <li><a href="../master/templates.html">master</a></li>
+</ul>
+<h3>Tags</h3>
+<ul>
+  <li><a href="../v0.1.1/templates.html">v0.1.1</a></li>
+  <li><a href="../v0.2.0/templates.html">v0.2.0</a></li>
+  <li><a href="../v0.2.1/templates.html">v0.2.1</a></li>
+  <li><a href="templates.html">v0.2.2</a></li>
+  <li><a href="../v0.2.3/templates.html">v0.2.3</a></li>
+  <li><a href="../v0.2.4/templates.html">v0.2.4</a></li>
+</ul>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2021, Jan Holthuis.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.0.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/templates.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+    <a href="https://github.com/Holzhaus/sphinx-multiversion" class="github">
+        <img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub"  class="github"/>
+    </a>
+    
+
+    
+  </body>
+</html>
