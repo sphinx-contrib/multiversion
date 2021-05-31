@@ -18,6 +18,14 @@ DEFAULT_BRANCH_WHITELIST = r"^.*$"
 DEFAULT_REMOTE_WHITELIST = None
 DEFAULT_RELEASED_PATTERN = r"^tags/.*$"
 DEFAULT_OUTPUTDIR_FORMAT = r"{ref.name}"
+DEFAULT_BUILD_TARGETS = {
+    "HTML": {
+        "builder": "html",
+        "downloadable": False,
+        "download_format": "",
+    },
+}
+DEFAULT_CLEAN_INTERMEDIATE_FILES_FLAG = True
 
 Version = collections.namedtuple(
     "Version",
@@ -209,6 +217,12 @@ def setup(app):
     )
     app.add_config_value(
         "smv_outputdir_format", DEFAULT_OUTPUTDIR_FORMAT, "html"
+    )
+    app.add_config_value("smv_build_targets", DEFAULT_BUILD_TARGETS, "html")
+    app.add_config_value(
+        "smv_clean_intermediate_files",
+        DEFAULT_CLEAN_INTERMEDIATE_FILES_FLAG,
+        "html",
     )
     app.connect("config-inited", config_inited)
 
