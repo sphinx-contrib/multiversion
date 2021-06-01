@@ -23,7 +23,7 @@ setup(
     version="0.2.4",
     install_requires=["sphinx >= 2.1"],
     license="BSD",
-    packages=["sphinx_multiversion"],
+    packages=["sphinx_multiversion", "sphinx_multiversion.lib"],
     entry_points={
         "console_scripts": [
             "sphinx-multiversion=sphinx_multiversion:main",

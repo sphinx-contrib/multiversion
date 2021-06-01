@@ -2,8 +2,13 @@ import os.path
 import posixpath
 import tempfile
 import unittest
+from unittest.mock import Mock
 
 import sphinx_multiversion
+
+mock = Mock()
+myapp = mock.config
+myapp.config.project = "example"
 
 
 class VersionInfoTestCase(unittest.TestCase):
@@ -11,7 +16,7 @@ class VersionInfoTestCase(unittest.TestCase):
         root = tempfile.gettempdir()
 
         self.versioninfo = sphinx_multiversion.sphinx.VersionInfo(
-            app=None,
+            app=myapp,
             context={"pagename": "testpage"},
             metadata={
                 "master": {
@@ -26,6 +31,13 @@ class VersionInfoTestCase(unittest.TestCase):
                     "outputdir": os.path.join(root, "build", "html", "master"),
                     "confdir": os.path.join(root, "master", "docs"),
                     "docnames": ["testpage", "appendix/faq"],
+                    "build_targets": {
+                        "HTML": {
+                            "builder": "html",
+                            "downloadable": True,
+                            "download_format": "zip",
+                        },
+                    },
                 },
                 "v0.1.0": {
                     "name": "v0.1.0",
@@ -39,6 +51,13 @@ class VersionInfoTestCase(unittest.TestCase):
                     "outputdir": os.path.join(root, "build", "html", "v0.1.0"),
                     "confdir": os.path.join(root, "v0.1.0", "docs"),
                     "docnames": ["old_testpage", "appendix/faq"],
+                    "build_targets": {
+                        "HTML": {
+                            "builder": "html",
+                            "downloadable": True,
+                            "download_format": "zip",
+                        },
+                    },
                 },
                 "branch-with/slash": {
                     "name": "branch-with/slash",
@@ -56,6 +75,13 @@ class VersionInfoTestCase(unittest.TestCase):
                     ),
                     "confdir": os.path.join(root, "branch-with/slash", "docs"),
                     "docnames": ["testpage"],
+                    "build_targets": {
+                        "HTML": {
+                            "builder": "html",
+                            "downloadable": True,
+                            "download_format": "zip",
+                        },
+                    },
                 },
             },
             current_version_name="master",
@@ -113,4 +139,36 @@ class VersionInfoTestCase(unittest.TestCase):
         self.assertEqual(
             self.versioninfo.vpathto("branch-with/slash"),
             posixpath.join("..", "..", "branch-with/slash", "index.html"),
+        )
+
+    def test_apathto(self):
+        build_targets = {
+            "HTML": {
+                "builder": "html",
+                "downloadable": True,
+                "download_format": "zip",
+            },
+            "PDF": {
+                "builder": "latexpdf",
+                "downloadable": True,
+                "download_format": "pdf",
+            },
+        }
+        self.assertEqual(
+            self.versioninfo.apathto("HTML", build_targets["HTML"]),
+            posixpath.join("artefacts", "example_docs-master-HTML.zip"),
+        )
+        self.assertEqual(
+            self.versioninfo.apathto("PDF", build_targets["PDF"]),
+            "artefacts/example_docs-master.pdf",
+        )
+
+        mock_versioninfo = self.versioninfo
+        mock_versioninfo.current_version_name = "branch-with/slash"
+
+        self.versioninfo = Mock()
+        self.versioninfo = mock_versioninfo
+        self.assertEqual(
+            self.versioninfo.apathto("PDF", build_targets["PDF"]),
+            "artefacts/example_docs-branch-with-slash.pdf",
         )

@@ -26,6 +26,7 @@ DEFAULT_BUILD_TARGETS = {
     },
 }
 DEFAULT_CLEAN_INTERMEDIATE_FILES_FLAG = True
+ARCHIVE_TYPES = ["zip", "tar", "gztar", "bztar", "xztar"]
 
 Version = collections.namedtuple(
     "Version",
@@ -35,6 +36,7 @@ Version = collections.namedtuple(
         "version",
         "release",
         "is_released",
+        "artefacts",
     ],
 )
 
@@ -53,6 +55,11 @@ class VersionInfo:
             version=v["version"],
             release=v["release"],
             is_released=v["is_released"],
+            artefacts=[
+                {"name": name, "url": self.apathto(name, target)}
+                for name, target in v["build_targets"].items()
+                if self.apathto(name, target) is not None
+            ],
         )
 
     @property
@@ -145,6 +152,32 @@ class VersionInfo:
         return posixpath.join(
             other_outputdir, "{}.html".format(self.context["pagename"])
         )
+
+    def apathto(self, build_target_name, build_target):
+        """Find the path to the artefact identified by build_target_name
+        and build_target.
+        """
+        artefact_dir = "artefacts"
+
+        filename = "{project}_docs-{version}".format(
+            project=self.app.config.project,
+            version=self.current_version_name.replace("/", "-"),
+        )
+
+        if build_target["download_format"] in ARCHIVE_TYPES:
+            filename = "{f}-{build_name}.{extension}".format(
+                f=filename,
+                build_name=build_target_name,
+                extension=build_target["download_format"],
+            )
+        else:
+            filename = "{f}.{extension}".format(
+                f=filename,
+                extension=build_target["download_format"],
+            )
+        artefact_path = posixpath.join(artefact_dir, filename)
+
+        return artefact_path
 
 
 def html_page_context(app, pagename, templatename, context, doctree):

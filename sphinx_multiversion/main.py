@@ -6,7 +6,6 @@ import contextlib
 import json
 import logging
 import os
-import shutil
 import pathlib
 import glob
 import re
@@ -20,6 +19,7 @@ from sphinx import project as sphinx_project
 
 from . import sphinx
 from . import git
+from .lib import shutil
 
 
 @contextlib.contextmanager
@@ -409,13 +409,12 @@ def main(argv=None):
                     os.makedirs(artefact_dir, exist_ok=True)
                     filename = "{project}_docs-{version}".format(
                         project=current_config.project,
-                        version=version_name,
+                        version=version_name.replace("/", "-"),
                     )
 
                     # Make an archive out of the build targets build directory
                     # Archive types supported by shutil.make_archive
-                    archive_types = ["zip", "tar", "gztar", "bztar", "xztar"]
-                    if download_format in archive_types:
+                    if download_format in sphinx.ARCHIVE_TYPES:
                         shutil.make_archive(
                             "{}/{}-{}".format(
                                 artefact_dir, filename, build_target_name
