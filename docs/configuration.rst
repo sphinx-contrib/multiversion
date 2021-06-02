@@ -29,6 +29,19 @@ This is what the default configuration looks like:
     # Determines whether remote or local git branches/tags are preferred if their output dirs conflict
     smv_prefer_remote_refs = False
 
+    # Specify build targets and whether the resulting artefacts should be downloadable
+    smv_build_targets = {
+        "HTML" : {
+            "builder": "html",
+            "downloadable": False,
+            "download_format": "",
+        },
+    }
+
+    # Flag indicating whether the intermediate build directories should be removed after artefacts are produced
+    smv_clean_intermediate_files = True
+
+
 You can override all of these values inside your :file:`conf.py`.
 
 .. note::
@@ -104,6 +117,157 @@ Here are some examples:
 .. seealso::
 
     Have a look at `PyFormat <python_format_>`_ for information how to use new-stye Python formatting.
+
+Specify Additional Build Targets
+================================
+
+In addition to generating static HTML documentation, it is also possible to specify additional build targets for each version of your documentation by providing a value for the ``smv_build_targets`` setting. This can be used to generate and package the documentation for download, or for post processing by an external program. The ``smv_build_targets`` setting has the following format:
+
+.. code-block:: python
+
+   smv_build_targets = {
+       "build_target_name" : {
+           "builder": `<class sphinx.builders>`,
+           "downloadable": bool,
+           "download_format": str
+       },
+   }
+
+These fields can be populated as follows:
+
+* ``build_target_name``: This is the name of the build target. It must be unique within the ``smv_build_targets`` dictionary, and is used as the display name of the download artefacts if ``downloadable == True``.
+* ``builder``: This is the string identifying any valid `sphinx builder <https://www.sphinx-doc.org/en/master/usage/builders/index.html>`_.
+* ``downloadable``: Indicate whether an artefact for this build should be generated. All artefacts are placed within the ``build/version/artefacts`` directory and made available in the html context.
+* ``download_format``: A string indicating the format of the final downloadable artefact. Only valid if ``downloadable == True``. Valid values for this include ``tar``, ``zip``, ``pdf``, ``epub``, or any other extension for build artefacts produced by the sphinx builder specified in ``builder``.
+
+  .. note::
+
+     If ``tar`` or ``zip`` are specified, the entire build directory is archived. An example of this would be the ``html`` directory for a ``html`` sphinx builder, or the ``latex`` directory for a ``latex`` sphinx builder.
+
+  .. note::
+
+     When the build artefact is an individual file, it is only matched according to the pattern <project>.<download_format> to avoid the ambiguity associated with multiple matches to a file extension. To illustrate this limitation, html files are always indexed with ``index.html``, which would not be identified as an individual build artefact. Thus, in order to make HTML available as a build artefact it must be archived using ``zip``, ``tar``, ``gztar``, ``bztar`` or ``xztar``.
+
+Some common examples may be as follows:
+
+.. code-block:: python
+
+   smv_build_targets = {
+       "HTML" : {
+           "builder": "html",
+           "downloadable": True,
+           "download_format": "zip",
+       },
+       "SingleHTML" : {
+           "builder": "singlehtml",
+           "downloadable": True,
+           "download_format": "tar",
+       },
+       "PDF" : {
+           "builder": "latexpdf", # This will build a .pdf file after generating latex documents
+           "downloadable": True,
+           "download_format": "pdf",
+       },
+       "LaTeX" : {
+           "builder": "latex", # This will only generate latex documents.
+           "downloadable": True,
+           "download_format": "gztar",
+       },
+       "ePub" : {
+           "builder": "epub",
+           "downloadable": True,
+           "download_format": "epub",
+       },
+   }
+
+Additionally, the user is able to configure whether intermediate build files are cleaned from the output directory using the ``smv_clean_intermediate_files`` setting:
+
+.. code-block:: python
+
+   smv_clean_intermediate_files = True
+
+If this flag is ``True``, the resulting directory structure will resemble the following:
+
+.. code-block:: bash
+
+   build
+   ├── develop
+   │   ├── artefacts
+   │   │   ├── example_docs-develop.epub
+   │   │   ├── example_docs-develop-HTML.zip
+   │   │   └── example_docs-develop.pdf
+   │   ├── index.html
+   │   └── ...
+   ├── master
+   │   ├── artefacts
+   │   │   ├── example_docs-master.epub
+   │   │   ├── example_docs-master-HTML.zip
+   │   │   └── example_docs-master.pdf
+   │   ├── index.html
+   │   └── ...
+   └── v0.1.0
+       ├── artefacts
+       │   ├── example_docs-v0.1.0.epub
+       │   ├── example_docs-v0.1.0-HTML.zip
+       │   └── example_docs-v0.1.0.pdf
+       ├── index.html
+       └── ...
+
+However, if this flag is set to ``False``, the resulting directory will also include intermediate build directories:
+
+.. code-block:: bash
+
+   build
+   ├── develop
+   │   ├── artefacts
+   │   │   ├── example_docs-develop.epub
+   │   │   ├── example_docs-develop-HTML.zip
+   │   │   └── example_docs-develop.pdf
+   │   ├── epub
+   │   │   ├── example.epub
+   │   │   ├── index.xhtml
+   │   │   └── ...
+   │   ├── html
+   │   │   ├── index.html
+   │   │   └── ...
+   │   ├── index.html
+   │   ├── latexpdf
+   │   │   └── latex
+   │   └── ...
+   ├── master
+   │   ├── artefacts
+   │   │   ├── example_docs-master.epub
+   │   │   ├── example_docs-master-HTML.zip
+   │   │   └── example_docs-master.pdf
+   │   ├── epub
+   │   │   ├── example.epub
+   │   │   ├── index.xhtml
+   │   │   └── ...
+   │   ├── html
+   │   │   ├── index.html
+   │   │   └── ...
+   │   ├── index.html
+   │   ├── latexpdf
+   │   │   └── latex
+   │   └── ...
+   └── v0.1.0
+       ├── artefacts
+       │   ├── example_docs-v0.1.0.epub
+       │   ├── example_docs-v0.1.0-HTML.zip
+       │   └── example_docs-v0.1.0.pdf
+       ├── epub
+       │   ├── example.epub
+       │   ├── index.xhtml
+       │   └── ...
+       ├── html
+       │   ├── index.html
+       │   └── ...
+       ├── index.html
+       ├── latexpdf
+       │   └── latex
+       └── ...
+
+This will be useful if you want to use an external program to interact with the build output.
 
 
 Overriding Configuration Variables
