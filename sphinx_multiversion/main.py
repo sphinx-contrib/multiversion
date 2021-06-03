@@ -428,19 +428,26 @@ def main(argv=None):
                         # example.pdf in the target build directory
                         candidate_files = glob.glob(
                             "{build_dir}/**/*.{extension}".format(
-                                build_dir=target_build_dir, extension=download_format,
+                                build_dir=target_build_dir,
+                                extension=download_format,
                             ),
                             recursive=True,
                         )
-                        build_file_pattern = "{project}.{extension}".format(
-                            project=config.project.replace(" ", ""),
-                            extension=download_format,
-                        )
-                        build_artefacts = [
-                            x
-                            for x in candidate_files
-                            if pathlib.Path(x.lower()).name == build_file_pattern.lower()
-                        ]
+                        if len(candidate_files) > 1:
+                            build_file_pattern = (
+                                "{project}.{extension}".format(
+                                    project=config.project.replace(" ", ""),
+                                    extension=download_format,
+                                )
+                            )
+                            build_artefacts = [
+                                x
+                                for x in candidate_files
+                                if pathlib.Path(x.lower()).name
+                                == build_file_pattern.lower()
+                            ]
+                        else:
+                            build_artefacts = candidate_files
                         if len(build_artefacts) == 0:
                             logger.warning(
                                 (
