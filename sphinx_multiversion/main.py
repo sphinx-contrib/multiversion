@@ -288,6 +288,7 @@ def main(argv=None):
             )
             metadata[gitref.name] = {
                 "name": gitref.name,
+                "project": current_config.project,
                 "version": current_config.version,
                 "release": current_config.release,
                 "rst_prolog": current_config.rst_prolog,
@@ -408,7 +409,7 @@ def main(argv=None):
                     artefact_dir = "{}/artefacts".format(data["outputdir"])
                     os.makedirs(artefact_dir, exist_ok=True)
                     filename = "{project}_docs-{version}".format(
-                        project=current_config.project,
+                        project=config.project.replace(" ", ""),
                         version=version_name.replace("/", "-"),
                     )
 
@@ -425,22 +426,27 @@ def main(argv=None):
                     else:
                         # Find files matching project-name.extension, e.g.
                         # example.pdf in the target build directory
-                        build_artefacts = glob.glob(
-                            "{build_dir}/**/{project}.{extension}".format(
-                                build_dir=target_build_dir,
-                                project=current_config.project,
-                                extension=download_format,
+                        candidate_files = glob.glob(
+                            "{build_dir}/**/*.{extension}".format(
+                                build_dir=target_build_dir, extension=download_format,
                             ),
                             recursive=True,
                         )
+                        build_file_pattern = "{project}.{extension}".format(
+                            project=config.project.replace(" ", ""),
+                            extension=download_format,
+                        )
+                        build_artefacts = [
+                            x
+                            for x in candidate_files
+                            if pathlib.Path(x.lower()).name == build_file_pattern.lower()
+                        ]
                         if len(build_artefacts) == 0:
                             logger.warning(
                                 (
-                                    "Build artefact {project}.{extension} "
-                                    "not found."
+                                    "Build artefact {project}" "not found."
                                 ).format(
-                                    project=current_config.project,
-                                    extension=download_format,
+                                    project=build_file_pattern.lower(),
                                 )
                             )
                         elif len(build_artefacts) > 1:

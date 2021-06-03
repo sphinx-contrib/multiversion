@@ -160,7 +160,7 @@ class VersionInfo:
         artefact_dir = "artefacts"
 
         filename = "{project}_docs-{version}".format(
-            project=self.app.config.project,
+            project=self.app.config.project.replace(" ", ""),
             version=self.current_version_name.replace("/", "-"),
         )
 
