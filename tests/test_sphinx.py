@@ -160,15 +160,43 @@ class VersionInfoTestCase(unittest.TestCase):
         )
         self.assertEqual(
             self.versioninfo.apathto("PDF", build_targets["PDF"]),
-            "artefacts/example_docs-master.pdf",
+            posixpath.join("artefacts", "example_docs-master.pdf"),
         )
 
-        mock_versioninfo = self.versioninfo
-        mock_versioninfo.current_version_name = "branch-with/slash"
-
-        self.versioninfo = Mock()
-        self.versioninfo = mock_versioninfo
+        self.versioninfo.context["pagename"] = "appendix/faq"
         self.assertEqual(
             self.versioninfo.apathto("PDF", build_targets["PDF"]),
-            "artefacts/example_docs-branch-with-slash.pdf",
+            posixpath.join("..", "artefacts", "example_docs-master.pdf"),
+        )
+
+        self.versioninfo.context["pagename"] = "testpage"
+        self.versioninfo.current_version_name = "branch-with/slash"
+        self.assertEqual(
+            self.versioninfo.apathto("PDF", build_targets["PDF"]),
+            posixpath.join("artefacts", "example_docs-branch-with-slash.pdf"),
+        )
+        self.assertEqual(
+            self.versioninfo.apathto("HTML", build_targets["HTML"]),
+            posixpath.join(
+                "artefacts", "example_docs-branch-with-slash-HTML.zip"
+            ),
+        )
+
+        self.versioninfo.app.config.project = (
+            "Project Name with Spaces and VaRiAbLe case"
+        )
+        self.versioninfo.current_version_name = "master"
+        self.assertEqual(
+            self.versioninfo.apathto("HTML", build_targets["HTML"]),
+            posixpath.join(
+                "artefacts",
+                "ProjectNamewithSpacesandVaRiAbLecase_docs-master-HTML.zip",
+            ),
+        )
+        self.assertEqual(
+            self.versioninfo.apathto("PDF", build_targets["PDF"]),
+            posixpath.join(
+                "artefacts",
+                "ProjectNamewithSpacesandVaRiAbLecase_docs-master.pdf",
+            ),
         )

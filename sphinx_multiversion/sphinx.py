@@ -157,7 +157,12 @@ class VersionInfo:
         """Find the path to the artefact identified by build_target_name
         and build_target.
         """
-        artefact_dir = "artefacts"
+        current_version = self.metadata[self.current_version_name]
+        current_outputroot = os.path.abspath(current_version["outputdir"])
+        artefact_dir = posixpath.join(current_outputroot, "artefacts")
+        current_outputdir = posixpath.dirname(
+            posixpath.join(current_outputroot, self.context["pagename"])
+        )
 
         filename = "{project}_docs-{version}".format(
             project=self.app.config.project.replace(" ", ""),
@@ -175,8 +180,9 @@ class VersionInfo:
                 f=filename,
                 extension=build_target["download_format"],
             )
-        artefact_path = posixpath.join(artefact_dir, filename)
-
+        artefact_path = posixpath.relpath(
+            posixpath.join(artefact_dir, filename), start=current_outputdir
+        )
         return artefact_path
 
 
