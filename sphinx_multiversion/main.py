@@ -120,6 +120,19 @@ def get_python_flags():
             yield from ("-X", "{}={}".format(option, value))
 
 
+def generate_html_redirection_page(path=''):
+    return fr'''<!-- This page is created automatically by documentation builder -->
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Redirecting to main branch docs</title>
+    <meta charset="utf-8">
+    <meta http-equiv="refresh" content="0; url=./{path}">
+    <link rel="canonical" href="./{path}">
+  </head>
+</html>'''
+
+
 def main(argv=None):
     if not argv:
         argv = sys.argv[1:]
@@ -219,6 +232,7 @@ def main(argv=None):
         gitrefs = sorted(gitrefs, key=lambda x: (x.is_remote, *x))
 
     logger = logging.getLogger(__name__)
+    released_versions = []
 
     with tempfile.TemporaryDirectory() as tmp:
         # Generate Metadata
@@ -291,6 +305,9 @@ def main(argv=None):
                 "docnames": list(project.discover()),
             }
 
+            if metadata[gitref.name]['is_released']:
+                released_versions.append(gitref.name)
+        
         if args.dump_metadata:
             print(json.dumps(metadata, indent=2))
             return 0
@@ -298,6 +315,12 @@ def main(argv=None):
         if not metadata:
             logger.error("No matching refs found!")
             return 2
+
+        # Generate HTML page which redirects to latest released docs
+        html_file_path = os.path.abspath(os.path.join(sourcedir, "_static/index.html"))
+        with open(html_file_path, mode="w") as fp:
+            redirection_path = released_versions[-1] + "/index.html"
+            fp.write(generate_html_redirection_page(redirection_path))
 
         # Write Metadata
         metadata_path = os.path.abspath(os.path.join(tmp, "versions.json"))
@@ -320,6 +343,8 @@ def main(argv=None):
             current_argv.extend(
                 [
                     *defines,
+                    "-D",
+                    "smv_latest_version={}".format(released_versions[-1]),
                     "-D",
                     "smv_current_version={}".format(version_name),
                     "-c",

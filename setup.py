@@ -20,7 +20,7 @@ setup(
     author="Jan Holthuis",
     author_email="holthuis.jan@googlemail.com",
     url="https://github.com/freetonik/sphinx-multiversion-contrib",
-    version="0.2.5",
+    version="0.2.6",
     install_requires=["sphinx >= 2.1"],
     license="BSD",
     packages=["sphinx_multiversion"],
