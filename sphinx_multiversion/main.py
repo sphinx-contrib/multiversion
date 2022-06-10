@@ -275,7 +275,7 @@ def main(argv=None):
             metadata[gitref.name] = {
                 "name": gitref.name,
                 "version": current_config.version,
-                "release": current_config.release,
+                "release": gitref.name,
                 "rst_prolog": current_config.rst_prolog,
                 "is_released": bool(
                     re.match(config.smv_released_pattern, gitref.refname)
