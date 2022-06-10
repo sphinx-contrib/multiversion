@@ -7,7 +7,7 @@ with open(os.path.join(os.path.dirname(__file__), "README.md")) as f:
     readme = f.read()
 
 setup(
-    name="sphinx-multiversion",
+    name="sphinx-multiversion-contrib",
     description="Add support for multiple versions to sphinx",
     long_description=readme,
     long_description_content_type="text/markdown",
@@ -19,8 +19,8 @@ setup(
     ],
     author="Jan Holthuis",
     author_email="holthuis.jan@googlemail.com",
-    url="https://holzhaus.github.io/sphinx-multiversion/",
-    version="0.2.4",
+    url="https://github.com/freetonik/sphinx-multiversion-contrib",
+    version="0.2.5",
     install_requires=["sphinx >= 2.1"],
     license="BSD",
     packages=["sphinx_multiversion"],
