@@ -175,11 +175,6 @@ def main(argv=None):
         help="dump generated metadata and exit",
     )
     parser.add_argument(
-        "--add-dev",
-        action="store_true",
-        help="build development version from current directory",
-    )
-    parser.add_argument(
         "--dev-name",
         metavar="DEV_NAME",
         dest="dev_name",
