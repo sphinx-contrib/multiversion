@@ -57,6 +57,9 @@ Here are some examples:
 
     To list values to match, you can use ``git branch``, ``git tag`` and ``git remote``.
 
+In addition, sphinx-multiversion can build the development version of the docs from the current directory, not from a git reference. To do so, provide the name for a development version using the ``--dev-name`` option. For example, ``--dev-name dev`` will build the development version under name ``dev``. The development version is always marked as not released.
+
+By default, the development version of the docs is stored in the root build directory. You can change this by providing a path relative to the root build directory using the ``--dev-path`` option. For example, ``--dev-path dev/current`` will build the development version in ``dev/current`` subdirectory inside the root build directory.
 
 Release Pattern
 ===============
