@@ -12,6 +12,7 @@ import string
 import subprocess
 import sys
 import tempfile
+import datetime
 
 from sphinx import config as sphinx_config
 from sphinx import project as sphinx_project
@@ -173,6 +174,28 @@ def main(argv=None):
         action="store_true",
         help="dump generated metadata and exit",
     )
+    parser.add_argument(
+        "--add-dev",
+        action="store_true",
+        help="build development version from current directory",
+    )
+    parser.add_argument(
+        "--dev-name",
+        metavar="DEV_NAME",
+        dest="dev_name",
+        help=(
+            "name for the development version of docs to be built"
+        ),
+    )
+    parser.add_argument(
+        "--dev-path",
+        metavar="DEV_PATH",
+        dest="dev_path",
+        help=(
+            "path where to store the development version of docs "
+            "(default: root build directory)"
+        ),
+    )
     args, argv = parser.parse_known_args(argv)
     if args.noconfig:
         return 1
@@ -308,6 +331,24 @@ def main(argv=None):
             if metadata[gitref.name]['is_released']:
                 released_versions.append(gitref.name)
         
+        if args.dev_name:
+            metadata[args.dev_name] = {
+                "name": args.dev_name,
+                "version": args.dev_name,
+                "release": args.dev_name,
+                "rst_prolog": current_config.rst_prolog,
+                "is_released": False,
+                "source": "heads",
+                "creatordate": datetime.datetime.now(datetime.timezone.utc).strftime(sphinx.DATE_FMT),
+                "basedir": repopath,
+                "sourcedir": confdir_absolute,
+                "outputdir": os.path.join(
+                    os.path.abspath(args.outputdir), args.dev_path or ""
+                ),
+                "confdir": confpath,
+                "docnames": list(project.discover()),
+            }
+
         if args.dump_metadata:
             print(json.dumps(metadata, indent=2))
             return 0
