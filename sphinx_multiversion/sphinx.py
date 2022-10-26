@@ -59,6 +59,7 @@ class VersionInfo:
                 {"name": name, "url": self.apathto(name, target)}
                 for name, target in v["build_targets"].items()
                 if self.apathto(name, target) is not None
+                and target["downloadable"]
             ],
         )
 

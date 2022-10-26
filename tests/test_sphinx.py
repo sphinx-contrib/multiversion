@@ -37,6 +37,11 @@ class VersionInfoTestCase(unittest.TestCase):
                             "downloadable": True,
                             "download_format": "zip",
                         },
+                        "PDF": {
+                            "builder": "latexpdf",
+                            "downloadable": False,
+                            "download_format": "pdf",
+                        },
                     },
                 },
                 "v0.1.0": {
@@ -107,6 +112,16 @@ class VersionInfoTestCase(unittest.TestCase):
         self.assertEqual(
             [version.name for version in versions],
             ["master", "branch-with/slash"],
+        )
+
+    def test_artefacts_only_available_if_downloadable(self):
+        versions = self.versioninfo.branches
+        master_branch = [version for version in versions if version.name == "master"][0]
+
+        # Only HTML should be in the artefact list because PDF has downloadable = False
+        self.assertEqual(
+            [artefact["name"] for artefact in master_branch.artefacts],
+            ["HTML"]
         )
 
     def test_vhasdoc(self):
