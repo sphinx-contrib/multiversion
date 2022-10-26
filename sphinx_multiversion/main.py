@@ -7,6 +7,7 @@ import json
 import logging
 import os
 import pathlib
+import glob
 import re
 import string
 import subprocess
@@ -18,6 +19,7 @@ from sphinx import project as sphinx_project
 
 from . import sphinx
 from . import git
+from .lib import shutil
 
 
 @contextlib.contextmanager
@@ -66,7 +68,19 @@ def load_sphinx_config_worker(q, confpath, confoverrides, add_defaults):
                 "html",
                 str,
             )
+            current_config.add(
+                "smv_build_targets",
+                sphinx.DEFAULT_BUILD_TARGETS,
+                "html",
+                {str: {str: str}},
+            )
             current_config.add("smv_prefer_remote_refs", False, "html", bool)
+            current_config.add(
+                "smv_clean_intermediate_files",
+                sphinx.DEFAULT_CLEAN_INTERMEDIATE_FILES_FLAG,
+                "html",
+                bool,
+            )
         current_config.pre_init_values()
         current_config.init_values()
     except Exception as err:
@@ -274,6 +288,7 @@ def main(argv=None):
             )
             metadata[gitref.name] = {
                 "name": gitref.name,
+                "project": current_config.project,
                 "version": current_config.version,
                 "release": current_config.release,
                 "rst_prolog": current_config.rst_prolog,
@@ -289,6 +304,7 @@ def main(argv=None):
                 ),
                 "confdir": confpath,
                 "docnames": list(project.discover()),
+                "build_targets": config.smv_build_targets,
             }
 
         if args.dump_metadata:
@@ -324,31 +340,149 @@ def main(argv=None):
                     "smv_current_version={}".format(version_name),
                     "-c",
                     confdir_absolute,
-                    data["sourcedir"],
-                    data["outputdir"],
                     *args.filenames,
                 ]
             )
-            logger.debug("Running sphinx-build with args: %r", current_argv)
-            cmd = (
-                sys.executable,
-                *get_python_flags(),
-                "-m",
-                "sphinx",
-                *current_argv,
-            )
-            current_cwd = os.path.join(data["basedir"], cwd_relative)
-            env = os.environ.copy()
-            env.update(
-                {
-                    "SPHINX_MULTIVERSION_NAME": data["name"],
-                    "SPHINX_MULTIVERSION_VERSION": data["version"],
-                    "SPHINX_MULTIVERSION_RELEASE": data["release"],
-                    "SPHINX_MULTIVERSION_SOURCEDIR": data["sourcedir"],
-                    "SPHINX_MULTIVERSION_OUTPUTDIR": data["outputdir"],
-                    "SPHINX_MULTIVERSION_CONFDIR": data["confdir"],
-                }
-            )
-            subprocess.check_call(cmd, cwd=current_cwd, env=env)
+            for build_target_name, build_target in data[
+                "build_targets"
+            ].items():
+                builder = build_target.get("builder", None)
+                if not builder:
+                    raise AttributeError(
+                        "Builder for build target {} not defined".format(
+                            build_target_name
+                        )
+                    )
+
+                downloadable = build_target.get("downloadable", False)
+                download_format = build_target.get("download_format", "")
+
+                if downloadable and download_format == "":
+                    raise ValueError(
+                        (
+                            "Download format for build target {} not defined "
+                            "but downloadable is True"
+                        ).format(build_target_name)
+                    )
+
+                flag = "-b"
+                builder_modifier = builder
+                if builder == "latexpdf" or builder == "info":
+                    flag = "-M"
+
+                build_args = [flag, builder]
+                target_build_dir = "{}/{}".format(
+                    data["outputdir"], builder_modifier
+                )
+                logger.debug(
+                    "Running sphinx-build with args: %r",
+                    build_args + current_argv,
+                )
+                # Create sphinx-build command
+                cmd = (
+                    sys.executable,
+                    *get_python_flags(),
+                    "-m",
+                    "sphinx",
+                    *build_args,
+                    data["sourcedir"],
+                    target_build_dir,
+                    *current_argv,
+                )
+                current_cwd = os.path.join(data["basedir"], cwd_relative)
+                env = os.environ.copy()
+                env.update(
+                    {
+                        "SPHINX_MULTIVERSION_NAME": data["name"],
+                        "SPHINX_MULTIVERSION_VERSION": data["version"],
+                        "SPHINX_MULTIVERSION_RELEASE": data["release"],
+                        "SPHINX_MULTIVERSION_SOURCEDIR": data["sourcedir"],
+                        "SPHINX_MULTIVERSION_OUTPUTDIR": data["outputdir"],
+                        "SPHINX_MULTIVERSION_CONFDIR": data["confdir"],
+                    }
+                )
+                # Run sphinx-build
+                subprocess.check_call(cmd, cwd=current_cwd, env=env)
+
+                # Create artefacts if this build target should be downloadable
+                if downloadable:
+                    artefact_dir = "{}/artefacts".format(data["outputdir"])
+                    os.makedirs(artefact_dir, exist_ok=True)
+                    filename = "{project}_docs-{version}".format(
+                        project=config.project.replace(" ", ""),
+                        version=version_name.replace("/", "-"),
+                    )
+
+                    # Make an archive out of the build targets build directory
+                    # Archive types supported by shutil.make_archive
+                    if download_format in sphinx.ARCHIVE_TYPES:
+                        shutil.make_archive(
+                            "{}/{}-{}".format(
+                                artefact_dir, filename, build_target_name
+                            ),
+                            download_format,
+                            target_build_dir,
+                        )
+                    else:
+                        # Find files matching project-name.extension, e.g.
+                        # example.pdf in the target build directory
+                        candidate_files = glob.glob(
+                            "{build_dir}/**/*.{extension}".format(
+                                build_dir=target_build_dir,
+                                extension=download_format,
+                            ),
+                            recursive=True,
+                        )
+                        if len(candidate_files) > 1:
+                            build_file_pattern = (
+                                "{project}.{extension}".format(
+                                    project=config.project.replace(" ", ""),
+                                    extension=download_format,
+                                )
+                            )
+                            build_artefacts = [
+                                x
+                                for x in candidate_files
+                                if pathlib.Path(x.lower()).name
+                                == build_file_pattern.lower()
+                            ]
+                        else:
+                            build_artefacts = candidate_files
+                        if len(build_artefacts) == 0:
+                            logger.warning(
+                                (
+                                    "Build artefact {project}" "not found."
+                                ).format(
+                                    project=build_file_pattern.lower(),
+                                )
+                            )
+                        elif len(build_artefacts) > 1:
+                            logger.warning(
+                                (
+                                    "Ambiguous build artefact results: {}. "
+                                    "Files not moved to artefact directory."
+                                ).format(build_artefacts)
+                            )
+                        else:
+                            # Found a single file with appropriate extension
+                            shutil.copy(
+                                build_artefacts[0],
+                                os.path.join(
+                                    artefact_dir,
+                                    "{}.{}".format(filename, download_format),
+                                ),
+                            )
+
+                # Clean up build directory
+                # Move html target to root of outputdir, if it exists.
+                if build_target_name == "HTML":
+                    shutil.copytree(
+                        os.path.join(target_build_dir),
+                        os.path.join(data["outputdir"]),
+                        dirs_exist_ok=True,
+                    )
+                # Remove build directories
+                if config.smv_clean_intermediate_files:
+                    shutil.rmtree(target_build_dir)
 
     return 0

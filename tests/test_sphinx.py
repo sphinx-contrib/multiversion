@@ -2,8 +2,13 @@ import os.path
 import posixpath
 import tempfile
 import unittest
+from unittest.mock import Mock
 
 import sphinx_multiversion
+
+mock = Mock()
+myapp = mock.config
+myapp.config.project = "example"
 
 
 class VersionInfoTestCase(unittest.TestCase):
@@ -11,7 +16,7 @@ class VersionInfoTestCase(unittest.TestCase):
         root = tempfile.gettempdir()
 
         self.versioninfo = sphinx_multiversion.sphinx.VersionInfo(
-            app=None,
+            app=myapp,
             context={"pagename": "testpage"},
             metadata={
                 "master": {
@@ -26,6 +31,18 @@ class VersionInfoTestCase(unittest.TestCase):
                     "outputdir": os.path.join(root, "build", "html", "master"),
                     "confdir": os.path.join(root, "master", "docs"),
                     "docnames": ["testpage", "appendix/faq"],
+                    "build_targets": {
+                        "HTML": {
+                            "builder": "html",
+                            "downloadable": True,
+                            "download_format": "zip",
+                        },
+                        "PDF": {
+                            "builder": "latexpdf",
+                            "downloadable": False,
+                            "download_format": "pdf",
+                        },
+                    },
                 },
                 "v0.1.0": {
                     "name": "v0.1.0",
@@ -39,6 +56,13 @@ class VersionInfoTestCase(unittest.TestCase):
                     "outputdir": os.path.join(root, "build", "html", "v0.1.0"),
                     "confdir": os.path.join(root, "v0.1.0", "docs"),
                     "docnames": ["old_testpage", "appendix/faq"],
+                    "build_targets": {
+                        "HTML": {
+                            "builder": "html",
+                            "downloadable": True,
+                            "download_format": "zip",
+                        },
+                    },
                 },
                 "branch-with/slash": {
                     "name": "branch-with/slash",
@@ -56,6 +80,13 @@ class VersionInfoTestCase(unittest.TestCase):
                     ),
                     "confdir": os.path.join(root, "branch-with/slash", "docs"),
                     "docnames": ["testpage"],
+                    "build_targets": {
+                        "HTML": {
+                            "builder": "html",
+                            "downloadable": True,
+                            "download_format": "zip",
+                        },
+                    },
                 },
             },
             current_version_name="master",
@@ -81,6 +112,16 @@ class VersionInfoTestCase(unittest.TestCase):
         self.assertEqual(
             [version.name for version in versions],
             ["master", "branch-with/slash"],
+        )
+
+    def test_artefacts_only_available_if_downloadable(self):
+        versions = self.versioninfo.branches
+        master_branch = [version for version in versions if version.name == "master"][0]
+
+        # Only HTML should be in the artefact list because PDF has downloadable = False
+        self.assertEqual(
+            [artefact["name"] for artefact in master_branch.artefacts],
+            ["HTML"]
         )
 
     def test_vhasdoc(self):
@@ -113,4 +154,64 @@ class VersionInfoTestCase(unittest.TestCase):
         self.assertEqual(
             self.versioninfo.vpathto("branch-with/slash"),
             posixpath.join("..", "..", "branch-with/slash", "index.html"),
+        )
+
+    def test_apathto(self):
+        build_targets = {
+            "HTML": {
+                "builder": "html",
+                "downloadable": True,
+                "download_format": "zip",
+            },
+            "PDF": {
+                "builder": "latexpdf",
+                "downloadable": True,
+                "download_format": "pdf",
+            },
+        }
+        self.assertEqual(
+            self.versioninfo.apathto("HTML", build_targets["HTML"]),
+            posixpath.join("artefacts", "example_docs-master-HTML.zip"),
+        )
+        self.assertEqual(
+            self.versioninfo.apathto("PDF", build_targets["PDF"]),
+            posixpath.join("artefacts", "example_docs-master.pdf"),
+        )
+
+        self.versioninfo.context["pagename"] = "appendix/faq"
+        self.assertEqual(
+            self.versioninfo.apathto("PDF", build_targets["PDF"]),
+            posixpath.join("..", "artefacts", "example_docs-master.pdf"),
+        )
+
+        self.versioninfo.context["pagename"] = "testpage"
+        self.versioninfo.current_version_name = "branch-with/slash"
+        self.assertEqual(
+            self.versioninfo.apathto("PDF", build_targets["PDF"]),
+            posixpath.join("artefacts", "example_docs-branch-with-slash.pdf"),
+        )
+        self.assertEqual(
+            self.versioninfo.apathto("HTML", build_targets["HTML"]),
+            posixpath.join(
+                "artefacts", "example_docs-branch-with-slash-HTML.zip"
+            ),
+        )
+
+        self.versioninfo.app.config.project = (
+            "Project Name with Spaces and VaRiAbLe case"
+        )
+        self.versioninfo.current_version_name = "master"
+        self.assertEqual(
+            self.versioninfo.apathto("HTML", build_targets["HTML"]),
+            posixpath.join(
+                "artefacts",
+                "ProjectNamewithSpacesandVaRiAbLecase_docs-master-HTML.zip",
+            ),
+        )
+        self.assertEqual(
+            self.versioninfo.apathto("PDF", build_targets["PDF"]),
+            posixpath.join(
+                "artefacts",
+                "ProjectNamewithSpacesandVaRiAbLecase_docs-master.pdf",
+            ),
         )

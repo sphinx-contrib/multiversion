@@ -80,6 +80,19 @@ List releases and development versions separately
     </ul>
     {% endif %}
 
+List available downloads
+------------------------
+
+.. code-block:: html
+
+   {% if current_version.artefacts %}
+   <h3>{{ _('Downloads') }}</h3>
+   <ul>
+     {%- for artefact in current_version.artefacts  %}
+     <li><a href="{{ artefact.url }}">{{ artefact.name }}</a></li>
+     {%- endfor %}
+   </ul>
+   {% endif %}
 
 Version Banners
 ===============
@@ -136,6 +149,14 @@ So instead of adding a custom template to ``html_sidebars``, you need to create 
           <dt>Branches</dt>
           {%- for item in versions.branches %}
           <dd><a href="{{ item.url }}">{{ item.name }}</a></dd>
+          {%- endfor %}
+        </dl>
+        {%- endif %}
+        {%- if current_version.artefacts %}
+        <dl>
+          <dt>Downloads</dt>
+          {%- for artefact in current_version.artefacts %}
+          <dd><a href="{{ artefact.url }}">{{ artefact.name }}</a></dd>
           {%- endfor %}
         </dl>
         {%- endif %}

@@ -18,6 +18,15 @@ DEFAULT_BRANCH_WHITELIST = r"^.*$"
 DEFAULT_REMOTE_WHITELIST = None
 DEFAULT_RELEASED_PATTERN = r"^tags/.*$"
 DEFAULT_OUTPUTDIR_FORMAT = r"{ref.name}"
+DEFAULT_BUILD_TARGETS = {
+    "HTML": {
+        "builder": "html",
+        "downloadable": False,
+        "download_format": "",
+    },
+}
+DEFAULT_CLEAN_INTERMEDIATE_FILES_FLAG = True
+ARCHIVE_TYPES = ["zip", "tar", "gztar", "bztar", "xztar"]
 
 Version = collections.namedtuple(
     "Version",
@@ -27,6 +36,7 @@ Version = collections.namedtuple(
         "version",
         "release",
         "is_released",
+        "artefacts",
     ],
 )
 
@@ -45,6 +55,12 @@ class VersionInfo:
             version=v["version"],
             release=v["release"],
             is_released=v["is_released"],
+            artefacts=[
+                {"name": name, "url": self.apathto(name, target)}
+                for name, target in v["build_targets"].items()
+                if self.apathto(name, target) is not None
+                and target["downloadable"]
+            ],
         )
 
     @property
@@ -138,6 +154,38 @@ class VersionInfo:
             other_outputdir, "{}.html".format(self.context["pagename"])
         )
 
+    def apathto(self, build_target_name, build_target):
+        """Find the path to the artefact identified by build_target_name
+        and build_target.
+        """
+        current_version = self.metadata[self.current_version_name]
+        current_outputroot = os.path.abspath(current_version["outputdir"])
+        artefact_dir = posixpath.join(current_outputroot, "artefacts")
+        current_outputdir = posixpath.dirname(
+            posixpath.join(current_outputroot, self.context["pagename"])
+        )
+
+        filename = "{project}_docs-{version}".format(
+            project=self.app.config.project.replace(" ", ""),
+            version=self.current_version_name.replace("/", "-"),
+        )
+
+        if build_target["download_format"] in ARCHIVE_TYPES:
+            filename = "{f}-{build_name}.{extension}".format(
+                f=filename,
+                build_name=build_target_name,
+                extension=build_target["download_format"],
+            )
+        else:
+            filename = "{f}.{extension}".format(
+                f=filename,
+                extension=build_target["download_format"],
+            )
+        artefact_path = posixpath.relpath(
+            posixpath.join(artefact_dir, filename), start=current_outputdir
+        )
+        return artefact_path
+
 
 def html_page_context(app, pagename, templatename, context, doctree):
     versioninfo = VersionInfo(
@@ -209,6 +257,12 @@ def setup(app):
     )
     app.add_config_value(
         "smv_outputdir_format", DEFAULT_OUTPUTDIR_FORMAT, "html"
+    )
+    app.add_config_value("smv_build_targets", DEFAULT_BUILD_TARGETS, "html")
+    app.add_config_value(
+        "smv_clean_intermediate_files",
+        DEFAULT_CLEAN_INTERMEDIATE_FILES_FLAG,
+        "html",
     )
     app.connect("config-inited", config_inited)
 
