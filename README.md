@@ -6,3 +6,8 @@ This extension aims to provide a clean implementation that tries to avoid
 messing with Sphinx internals as much as possible.
 
 Documentation can be found at: https://holzhaus.github.io/sphinx-multiversion/
+
+---
+
+This is a fork of the original `sphinx-multiversion`. The fork was made at version `0.2.4`, and all newer versions 
+represent new features and bug fixes. See `docs/changelog.rst` for details.

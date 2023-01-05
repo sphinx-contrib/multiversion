@@ -7,6 +7,34 @@ Changelog
 Version 0.2
 ===========
 
+Version 0.2.9 (2023-01-05)
+--------------------------
+* Skip a build when output directory exists with flag ``--skip-if-outputdir-exists``.
+
+
+Version 0.2.8 (2022-07-20)
+--------------------------
+* Build development version of docs from current directory with ``--dev-name`` and ``--dev-path``.
+
+
+Version 0.2.7 (2022-07-20)
+--------------------------
+* Detect latest release, generate HTML redirection page.
+
+
+Version 0.2.6 (2022-06-10)
+--------------------------
+* Keep track of released versions
+* Pass `smv_latest_version` explicitly when calling Sphinx builder.
+* Generate a HTML page which redirects to the latest version of docs.
+
+
+Version 0.2.5 (2022-06-10)
+--------------------------
+* The original repo seems to be no longer maintained. There were new commits since the latest release `0.2.4`; this release includes all of them.
+* When reading metadata from `conf.py`, value `release` is now set to the name of git reference point.
+
+
 Version 0.2.4 (2020-08-12)
 --------------------------
 
