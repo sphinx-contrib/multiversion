@@ -61,6 +61,7 @@ In addition, sphinx-multiversion can build the development version of the docs f
 
 By default, the development version of the docs is stored in the root build directory. You can change this by providing a path relative to the root build directory using the ``--dev-path`` option. For example, ``--dev-path dev/current`` will build the development version in ``dev/current`` subdirectory inside the root build directory.
 
+
 Release Pattern
 ===============
 
@@ -107,6 +108,11 @@ Here are some examples:
 .. seealso::
 
     Have a look at `PyFormat <python_format_>`_ for information how to use new-style Python formatting.
+
+Skipping Build
+==============
+
+Building docs for a specific version can be skipped if the target directory already exists and ``--skip-if-outputdir-exists`` flag is passed to `sphinx-multiversion`. It does not check the contents of the directory, only its existence. This can be used to speed up the whole process, so that the docs for older versions are not rebuilt every time.
 
 
 Overriding Configuration Variables

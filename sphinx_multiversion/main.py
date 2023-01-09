@@ -175,6 +175,11 @@ def main(argv=None):
         help="dump generated metadata and exit",
     )
     parser.add_argument(
+        "--skip-if-outputdir-exists",
+        action="store_true",
+        help="skip building version if its output directory exists",
+    )
+    parser.add_argument(
         "--dev-name",
         metavar="DEV_NAME",
         dest="dev_name",
@@ -366,6 +371,17 @@ def main(argv=None):
         # Run Sphinx
         argv.extend(["-D", "smv_metadata_path={}".format(metadata_path)])
         for version_name, data in metadata.items():
+            # When --skip-if-outputdir-exists flag passed, do not build version if its output
+            # directory already exists. This does not check the contents of directory.
+            if args.skip_if_outputdir_exists:
+                if os.path.isdir(data['outputdir']) and data['name'] != args.dev_name:
+                    logger.warning(
+                        "Skipping version because outputdir '%s' for %s already exists",
+                        data['outputdir'],
+                        data['name'],
+                    )
+                    continue
+
             os.makedirs(data["outputdir"], exist_ok=True)
 
             defines = itertools.chain(
