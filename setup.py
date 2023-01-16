@@ -20,7 +20,7 @@ setup(
     author="Jan Holthuis",
     author_email="holthuis.jan@googlemail.com",
     url="https://github.com/iqm-finland/sphinx-multiversion-contrib",
-    version="0.2.9",
+    version="0.2.10",
     install_requires=["sphinx >= 2.1"],
     license="BSD",
     packages=["sphinx_multiversion"],

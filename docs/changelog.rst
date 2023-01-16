@@ -7,6 +7,11 @@ Changelog
 Version 0.2
 ===========
 
+Version 0.2.10 (2023-01-13)
+--------------------------
+* Try extracting the version from the git tag if it exists and sort based on that. Clients can configure an optional ``smv_symver_pattern`` if default patter is not suitable.
+
+
 Version 0.2.9 (2023-01-05)
 --------------------------
 * Skip a build when output directory exists with flag ``--skip-if-outputdir-exists``.

@@ -68,6 +68,7 @@ def load_sphinx_config_worker(q, confpath, confoverrides, add_defaults):
                 str,
             )
             current_config.add("smv_prefer_remote_refs", False, "html", bool)
+            current_config.add("smv_symver_pattern", r"^[^\d]*(\d*\.\d*).*$", "html", str)
         current_config.pre_init_values()
         current_config.init_values()
     except Exception as err:
@@ -253,6 +254,9 @@ def main(argv=None):
         gitrefs = sorted(gitrefs, key=lambda x: (not x.is_remote, *x))
     else:
         gitrefs = sorted(gitrefs, key=lambda x: (x.is_remote, *x))
+
+    # git refs by default are just strings, and we need to extract symver to be able to reasonably sort versions
+    gitrefs = sorted(gitrefs, key=lambda x: float(re.match(config.smv_symver_pattern, x.refname).group(1)))
 
     logger = logging.getLogger(__name__)
     released_versions = []
