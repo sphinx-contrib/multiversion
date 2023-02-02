@@ -261,7 +261,10 @@ def main(argv=None):
     logger = logging.getLogger(__name__)
     released_versions = []
 
-    with tempfile.TemporaryDirectory() as tmp:
+    with (
+        tempfile.TemporaryDirectory() as tmp,
+        tempfile.TemporaryDirectory() as doctree_cache
+    ):
         # Generate Metadata
         metadata = {}
         outputdirs = set()
@@ -416,6 +419,8 @@ def main(argv=None):
                 *get_python_flags(),
                 "-m",
                 "sphinx",
+                "-d",
+                doctree_cache,
                 *current_argv,
             )
             current_cwd = os.path.join(data["basedir"], cwd_relative)
