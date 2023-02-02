@@ -7,6 +7,11 @@ Changelog
 Version 0.2
 ===========
 
+Version 0.2.11 (2023-02-02)
+--------------------------
+* Reduce docs size.
+
+
 Version 0.2.10 (2023-01-13)
 --------------------------
 * Try extracting the version from the git tag if it exists and sort based on that. Clients can configure an optional ``smv_symver_pattern`` if default patter is not suitable.
