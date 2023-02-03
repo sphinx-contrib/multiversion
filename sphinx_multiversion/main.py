@@ -13,6 +13,7 @@ import subprocess
 import sys
 import tempfile
 import datetime
+import filecmp
 
 from sphinx import config as sphinx_config
 from sphinx import project as sphinx_project
@@ -261,7 +262,10 @@ def main(argv=None):
     logger = logging.getLogger(__name__)
     released_versions = []
 
-    with tempfile.TemporaryDirectory() as tmp:
+    with (
+        tempfile.TemporaryDirectory() as tmp,
+        tempfile.TemporaryDirectory() as doctree_cache
+    ):
         # Generate Metadata
         metadata = {}
         outputdirs = set()
@@ -416,6 +420,8 @@ def main(argv=None):
                 *get_python_flags(),
                 "-m",
                 "sphinx",
+                "-d",
+                doctree_cache,
                 *current_argv,
             )
             current_cwd = os.path.join(data["basedir"], cwd_relative)
@@ -431,5 +437,21 @@ def main(argv=None):
                 }
             )
             subprocess.check_call(cmd, cwd=current_cwd, env=env)
+
+    # check if there are any files in the versioned output directories identical to files in the root dev output directory and replace them with symlinks
+    if args.dev_name:
+        dev_outputdir = metadata[args.dev_name]['outputdir']
+        for version_name, data in metadata.items():
+            if version_name == args.dev_name:
+                continue
+            version_outputdir = data['outputdir']
+            for root, dirs, files in os.walk(version_outputdir):
+                for file in files:
+                    dev_file_path = os.path.join(dev_outputdir, os.path.relpath(root, version_outputdir), file)
+                    # check files are identical
+                    if os.path.exists(dev_file_path) and filecmp.cmp(os.path.join(root, file), dev_file_path):
+                        version_file_path = os.path.join(root, file)
+                        os.remove(version_file_path)
+                        os.symlink(dev_file_path, version_file_path)
 
     return 0
