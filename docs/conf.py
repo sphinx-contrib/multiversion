@@ -4,7 +4,7 @@ import time
 
 author = "Jan Holthuis"
 project = "sphinx-multiversion"
-release = "0.2.11"
+release = "0.2.12"
 version = "0.2"
 copyright = "{}, {}".format(time.strftime("%Y"), author)
 

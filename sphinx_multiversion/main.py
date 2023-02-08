@@ -13,7 +13,7 @@ import subprocess
 import sys
 import tempfile
 import datetime
-import filecmp
+import shutil
 
 from sphinx import config as sphinx_config
 from sphinx import project as sphinx_project
@@ -438,20 +438,21 @@ def main(argv=None):
             )
             subprocess.check_call(cmd, cwd=current_cwd, env=env)
 
-    # check if there are any files in the versioned output directories identical to files in the root dev output directory and replace them with symlinks
+    # change path for _static folder in all version html and css files to the _static folder of dev version
     if args.dev_name:
-        dev_outputdir = metadata[args.dev_name]['outputdir']
         for version_name, data in metadata.items():
-            if version_name == args.dev_name:
-                continue
-            version_outputdir = data['outputdir']
-            for root, dirs, files in os.walk(version_outputdir):
-                for file in files:
-                    dev_file_path = os.path.join(dev_outputdir, os.path.relpath(root, version_outputdir), file)
-                    # check files are identical
-                    if os.path.exists(dev_file_path) and filecmp.cmp(os.path.join(root, file), dev_file_path):
-                        version_file_path = os.path.join(root, file)
-                        os.remove(version_file_path)
-                        os.symlink(dev_file_path, version_file_path)
+            if version_name != args.dev_name:
+                for root, dirs, files in os.walk(data['outputdir']):
+                    for file in files:
+                        if file.endswith('.html') or file.endswith('.css'):
+                            file_path = os.path.join(root, file)
+                            with open(file_path, 'r') as f:
+                                filedata = f.read()
+                            # use relative path to the dev version _static folder
+                            filedata = filedata.replace("_static", "../../_static")
+                            with open(file_path, 'w') as f:
+                                f.write(filedata)
+                # and now remove the _static folder
+                shutil.rmtree(os.path.join(data['outputdir'], '_static'))
 
     return 0

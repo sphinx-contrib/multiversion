@@ -7,6 +7,11 @@ Changelog
 Version 0.2
 ===========
 
+Version 0.2.12 (2023-02-08)
+--------------------------
+* Reduce docs size.
+
+
 Version 0.2.11 (2023-02-02)
 --------------------------
 * Reduce docs size.
