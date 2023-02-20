@@ -438,21 +438,20 @@ def main(argv=None):
             )
             subprocess.check_call(cmd, cwd=current_cwd, env=env)
 
-    # change path for _static folder in all version html and css files to the _static folder of dev version
-    if args.dev_name:
-        for version_name, data in metadata.items():
-            if version_name != args.dev_name:
-                for root, dirs, files in os.walk(data['outputdir']):
-                    for file in files:
-                        if file.endswith('.html') or file.endswith('.css'):
-                            file_path = os.path.join(root, file)
-                            with open(file_path, 'r') as f:
-                                filedata = f.read()
-                            # use relative path to the dev version _static folder
-                            filedata = filedata.replace("_static", "../../_static")
-                            with open(file_path, 'w') as f:
-                                f.write(filedata)
-                # and now remove the _static folder
-                shutil.rmtree(os.path.join(data['outputdir'], '_static'))
+            # change path for _static folder in all version html and css files to the _static folder of dev version
+            if args.dev_name:
+                if version_name != args.dev_name:
+                    for root, dirs, files in os.walk(data['outputdir']):
+                        for file in files:
+                            if file.endswith('.html') or file.endswith('.css'):
+                                file_path = os.path.join(root, file)
+                                with open(file_path, 'r') as f:
+                                    filedata = f.read()
+                                # use relative path to the dev version _static folder
+                                filedata = filedata.replace("_static", "../../_static")
+                                with open(file_path, 'w') as f:
+                                    f.write(filedata)
+                    # and now remove the _static folder
+                    shutil.rmtree(os.path.join(data['outputdir'], '_static'))
 
     return 0
