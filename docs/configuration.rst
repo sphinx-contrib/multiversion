@@ -71,7 +71,7 @@ Here are some examples:
     smv_released_pattern = r'^tags/.*$'           # Tags only
     smv_released_pattern = r'^heads/\d+\.\d+$'    # Branches like "2.1"
     smv_released_pattern = r'^(tags/.*|heads/\d+\.\d+)$'           # Branches like "2.1" and all tags
-    smv_released_pattern = r'^(heads|remotes/[^/]+)/(?!:master).*$' # Everything except master branch
+    smv_released_pattern = r'^(tags|heads|remotes/[^/]+)/(?!master).*$' # Everything except master branch
 
 .. note::
 
