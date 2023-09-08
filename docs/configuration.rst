@@ -68,10 +68,10 @@ Here are some examples:
 
 .. code-block:: python
 
-    smv_released_pattern = r'^tags/.*$'           # Tags only
-    smv_released_pattern = r'^heads/\d+\.\d+$'    # Branches like "2.1"
-    smv_released_pattern = r'^(tags/.*|heads/\d+\.\d+)$'           # Branches like "2.1" and all tags
-    smv_released_pattern = r'^(tags|heads|remotes/[^/]+)/(?!master).*$' # Everything except master branch
+    smv_released_pattern = r'^refs/tags/.*$'           # Tags only
+    smv_released_pattern = r'^refs/heads/\d+\.\d+$'    # Branches like "2.1"
+    smv_released_pattern = r'^refs/(tags/.*|heads/\d+\.\d+)$'           # Branches like "2.1" and all tags
+    smv_released_pattern = r'^refs/(tags|heads|remotes/[^/]+)/(?!master).*$' # Everything except master branch
 
 .. note::
 
@@ -79,7 +79,7 @@ Here are some examples:
 
     .. code-block:: bash
 
-        git for-each-ref --format "%(refname)" | sed 's/^refs\///g'
+        git for-each-ref --format "%(refname)"
 
 
 Output Directory Format
