@@ -7,6 +7,8 @@ import re
 import subprocess
 import tarfile
 import tempfile
+import shutil
+
 
 GitRef = collections.namedtuple(
     "VersionRef",
@@ -168,3 +170,18 @@ def copy_tree(gitroot, src, dst, reference, sourcepath="."):
         fp.seek(0)
         with tarfile.TarFile(fileobj=fp) as tarfp:
             tarfp.extractall(dst)
+
+        cmd = (
+            "git",
+            "submodule",
+            "status",
+        )
+        output = subprocess.check_output(cmd, cwd=gitroot).decode()
+        for line in output.splitlines():
+            fields = line.strip().split(" ")
+            if len(fields) != 3:
+                continue
+            name = fields[1]
+            srcpath = os.path.join(gitroot, name)
+            dstpath = os.path.join(dst, name)
+            shutil.copytree(srcpath, dstpath, dirs_exist_ok=True)

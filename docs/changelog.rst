@@ -7,6 +7,11 @@ Changelog
 Version 0.2
 ===========
 
+Version 0.2.5 (2023-09-13)
+--------------------------
+
+* Added partial support for git submodules. Now it is simply copied to a temporary folder from gitroot.
+
 Version 0.2.4 (2020-08-12)
 --------------------------
 
