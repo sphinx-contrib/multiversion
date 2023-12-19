@@ -154,6 +154,13 @@ def file_exists(gitroot, refname, filename):
 
 
 def copy_tree(gitroot, src, dst, reference, sourcepath="."):
+    # Create the destination directory if it doesn't exist
+    os.makedirs(dst, exist_ok=True)
+
+    # Initialize a new Git repository in the destination directory
+    subprocess.check_call(["git", "init"], cwd=dst)
+
+    # Get reference commit
     with tempfile.SpooledTemporaryFile() as fp:
         cmd = (
             "git",
