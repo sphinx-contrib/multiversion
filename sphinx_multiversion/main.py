@@ -12,6 +12,7 @@ import string
 import subprocess
 import sys
 import tempfile
+import shutil
 
 from sphinx import config as sphinx_config
 from sphinx import project as sphinx_project
@@ -240,6 +241,7 @@ def main(argv=None):
             # Find config
             confpath = os.path.join(repopath, confdir)
             try:
+                shutil.copy(os.path.join(confdir_absolute, "conf.py"), confpath)
                 current_config = load_sphinx_config(confpath, confoverrides)
             except (OSError, sphinx_config.ConfigError):
                 logger.error(
