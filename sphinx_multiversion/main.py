@@ -31,7 +31,7 @@ def working_dir(path):
         os.chdir(prev_cwd)
 
 
-def load_sphinx_config_worker(q, confpath, confoverrides, add_defaults):
+def load_sphinx_config_worker(q, confpath, confoverrides):
     try:
         with working_dir(confpath):
             current_config = sphinx_config.Config.read(
@@ -39,35 +39,35 @@ def load_sphinx_config_worker(q, confpath, confoverrides, add_defaults):
                 confoverrides,
             )
 
-        if add_defaults:
-            current_config.add(
-                "smv_tag_whitelist", sphinx.DEFAULT_TAG_WHITELIST, "html", str
-            )
-            current_config.add(
-                "smv_branch_whitelist",
-                sphinx.DEFAULT_TAG_WHITELIST,
-                "html",
-                str,
-            )
-            current_config.add(
-                "smv_remote_whitelist",
-                sphinx.DEFAULT_REMOTE_WHITELIST,
-                "html",
-                str,
-            )
-            current_config.add(
-                "smv_released_pattern",
-                sphinx.DEFAULT_RELEASED_PATTERN,
-                "html",
-                str,
-            )
-            current_config.add(
-                "smv_outputdir_format",
-                sphinx.DEFAULT_OUTPUTDIR_FORMAT,
-                "html",
-                str,
-            )
-            current_config.add("smv_prefer_remote_refs", False, "html", bool)
+        current_config.add(
+            "smv_tag_whitelist", sphinx.DEFAULT_TAG_WHITELIST, "html", str
+        )
+        current_config.add(
+            "smv_branch_whitelist",
+            sphinx.DEFAULT_TAG_WHITELIST,
+            "html",
+            str,
+        )
+        current_config.add(
+            "smv_remote_whitelist",
+            sphinx.DEFAULT_REMOTE_WHITELIST,
+            "html",
+            str,
+        )
+        current_config.add(
+            "smv_released_pattern",
+            sphinx.DEFAULT_RELEASED_PATTERN,
+            "html",
+            str,
+        )
+        current_config.add(
+            "smv_outputdir_format",
+            sphinx.DEFAULT_OUTPUTDIR_FORMAT,
+            "html",
+            str,
+        )
+        current_config.add("smv_prefer_remote_refs", False, "html", bool)
+
         current_config.pre_init_values()
         current_config.init_values()
     except Exception as err:
@@ -77,7 +77,7 @@ def load_sphinx_config_worker(q, confpath, confoverrides, add_defaults):
     q.put(current_config)
 
 
-def load_sphinx_config(confpath, confoverrides, add_defaults=False):
+def load_sphinx_config(confpath, confoverrides):
     q = multiprocessing.Queue()
     proc = multiprocessing.Process(
         target=load_sphinx_config_worker,
@@ -181,9 +181,7 @@ def main(argv=None):
         confoverrides[key] = value
 
     # Parse config
-    config = load_sphinx_config(
-        confdir_absolute, confoverrides, add_defaults=True
-    )
+    config = load_sphinx_config(confdir_absolute, confoverrides)
 
     # Get relative paths to root of git repository
     gitroot = pathlib.Path(
