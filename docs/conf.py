@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """Sphinx configuration file."""
+
 import time
 
 author = "Jan Holthuis"
