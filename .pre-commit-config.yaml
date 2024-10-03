@@ -3,15 +3,16 @@ repos:
   rev: v2.3.0
   hooks:
   - id: trailing-whitespace
-  - id: flake8
   - id: check-merge-conflict
   - id: check-yaml
   - id: check-executables-have-shebangs
   - id: mixed-line-ending
--   repo: https://github.com/psf/black
-    rev: stable
-    hooks:
-    -   id: black
+- repo: https://github.com/astral-sh/ruff-pre-commit
+  rev: v0.6.8
+  hooks:
+    - id: ruff
+      args: [ --fix ]
+    - id: ruff-format
 - repo: local
   hooks:
   - id: version-check

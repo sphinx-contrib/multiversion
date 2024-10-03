@@ -35,5 +35,5 @@ include = [
     "/sphinx_multiversion",
 ]
 
-[tool.black]
+[tool.ruff]
 line-length = 79
