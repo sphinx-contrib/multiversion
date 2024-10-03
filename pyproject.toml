@@ -1,2 +1,39 @@
+[build-system]
+requires = ["hatchling", "hatch-requirements-txt"]
+build-backend = "hatchling.build"
+
+[project]
+name = "sphinx-multiversion"
+dynamic = ["version", "dependencies"]
+description = "Add support for multiple versions to sphinx"
+readme = "README.md"
+license = "BSD-2-Clause"
+authors = [
+    { name = "Jan Holthuis", email = "holthuis.jan@googlemail.com" },
+]
+classifiers = [
+    "License :: OSI Approved :: BSD License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.6",
+    "Programming Language :: Python :: 3.7",
+]
+
+[project.scripts]
+sphinx-multiversion = "sphinx_multiversion:main"
+
+[project.urls]
+Homepage = "https://holzhaus.github.io/sphinx-multiversion/"
+
+[tool.hatch.version]
+path = "sphinx_multiversion/__init__.py"
+
+[tool.hatch.metadata.hooks.requirements_txt]
+files = ["requirements.txt"]
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "/sphinx_multiversion",
+]
+
 [tool.black]
 line-length = 79

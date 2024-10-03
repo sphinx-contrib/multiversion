@@ -4,7 +4,6 @@ import os
 import pkgutil
 import re
 import runpy
-import subprocess
 import sys
 
 import docutils.nodes
@@ -79,15 +78,6 @@ def get_sphinxconfpy_version(rootdir):
     return sphinx_conf["version"], sphinx_conf["release"]
 
 
-def get_setuppy_version(rootdir):
-    """Get version from setup.py."""
-    setupfile = os.path.join(rootdir, "setup.py")
-    cmd = (sys.executable, setupfile, "--version")
-    release = subprocess.check_output(cmd).decode().rstrip(os.linesep)
-    version = release.rpartition(".")[0]
-    return version, release
-
-
 def get_package_version(rootdir):
     """Get version from package __init__.py."""
     sys.path.insert(0, os.path.join(rootdir))
@@ -110,7 +100,6 @@ def get_package_version(rootdir):
 def main():
     rootdir = os.path.join(os.path.dirname(__file__), "..")
 
-    setuppy_version, setuppy_release = get_setuppy_version(rootdir)
     package_version, package_release = get_package_version(rootdir)
     confpy_version, confpy_release = get_sphinxconfpy_version(rootdir)
     changelog_version, changelog_release = get_sphinxchangelog_version(rootdir)
@@ -121,7 +110,6 @@ def main():
             len(repr(x))
             for x in (
                 version_head,
-                setuppy_version,
                 package_version,
                 confpy_version,
                 changelog_version,
@@ -135,7 +123,6 @@ def main():
             len(repr(x))
             for x in (
                 release_head,
-                setuppy_release,
                 package_release,
                 confpy_release,
                 changelog_release,
@@ -147,9 +134,6 @@ def main():
         f"File                            {version_head} {release_head}\n"
         f"------------------------------- {'-' * version_width}"
         f" {'-' * release_width}\n"
-        f"setup.py                       "
-        f" {setuppy_version!r:>{version_width}}"
-        f" {setuppy_release!r:>{release_width}}\n"
         f"sphinx_multiversion/__init__.py"
         f" {package_version!r:>{version_width}}"
         f" {package_release!r:>{release_width}}\n"
@@ -161,13 +145,11 @@ def main():
         f" {changelog_release!r:>{release_width}}\n"
     )
 
-    assert setuppy_version == confpy_version
-    assert setuppy_version == package_version
-    assert setuppy_version == changelog_version
+    assert package_version == confpy_version
+    assert package_version == changelog_version
 
-    assert setuppy_release == confpy_release
-    assert setuppy_release == package_release
-    assert setuppy_release == changelog_release
+    assert package_release == confpy_release
+    assert package_release == changelog_release
 
 
 if __name__ == "__main__":
