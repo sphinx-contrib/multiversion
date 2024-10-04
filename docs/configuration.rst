@@ -85,7 +85,7 @@ Here are some examples:
 Output Directory Format
 =======================
 
-Each version will be built into a seperate subdirectory of the Sphinx output directory.
+Each version will be built into a separate subdirectory of the Sphinx output directory.
 The ``smv_outputdir_format`` setting determines the directory structure for the subdirectories. It is a new-style Python formatting string with two parameters - ``ref`` and ``config``.
 
 Here are some examples:
@@ -113,7 +113,7 @@ You can override configuration variables the same way as you're used to with ``s
 
 Since ``sphinx-multiversion`` copies the branch data into a temporary directory and builds them there while leaving the current working directory unchanged, relative paths in your :file:`conf.py` will refer to the path of the version *you're building from*, not the path of the version you are trying to build documentation for.
 
-Sometimes it might be necessary to override the configured path via a command line overide.
+Sometimes it might be necessary to override the configured path via a command line argument.
 ``sphinx-multiversion`` allows you to insert placeholders into your override strings that will automatically be replaced with the correct value for the version you're building the documentation for.
 
 Here's an example for the `exhale extension <exhale_>`_:
