@@ -7,6 +7,14 @@ Changelog
 Version 0.2
 ===========
 
+Version 0.2.5 (unreleased)
+--------------------------
+
+* Add support for version dependent RST prolog. (`#51 <issue51_>`_)
+* Fix various mistakes in the documentation. (`#52 <issue52_>`_, `#53 <issue53_>`_, `#55 <issue55_>`_, `#73 <issue73_>`_)
+* Move Git repository to `sphinx-contrib/multiversion <repositoryurl_>`_.
+* Switch CI to GitHub Actions and fix various code issues. (`#54 <issue54_>`_, `#117 <issue117_>`_, `#118 <issue118_>`_)
+
 Version 0.2.4 (2020-08-12)
 --------------------------
 
@@ -78,4 +86,14 @@ Version 0.1.0 (2020-03-11)
 .. _issue31: https://github.com/sphinx-contrib/multiversion/issues/31
 .. _issue35: https://github.com/sphinx-contrib/multiversion/issues/35
 .. _issue36: https://github.com/sphinx-contrib/multiversion/issues/36
+.. _issue51: https://github.com/sphinx-contrib/multiversion/issues/51
+.. _issue52: https://github.com/sphinx-contrib/multiversion/issues/52
+.. _issue53: https://github.com/sphinx-contrib/multiversion/issues/53
+.. _issue55: https://github.com/sphinx-contrib/multiversion/issues/55
+.. _issue73: https://github.com/sphinx-contrib/multiversion/issues/73
+.. _issue54: https://github.com/sphinx-contrib/multiversion/issues/54
+.. _issue117: https://github.com/sphinx-contrib/multiversion/issues/117
+.. _issue118: https://github.com/sphinx-contrib/multiversion/issues/118
+
 .. _pythonflags: https://docs.python.org/3/using/cmdline.html#miscellaneous-options
+.. _repositoryurl: https://github.com/sphinx-contrib/multiversion
