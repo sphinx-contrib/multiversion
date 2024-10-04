@@ -4,7 +4,7 @@
 Installation
 ============
 
-You can install ``sphinx-multiversion`` via `pip <pip_>`_ or directly from :file:`setup.py`.
+You can install ``sphinx-multiversion`` via `pip <pip_>`_.
 
 Install from PyPi
 ===================
@@ -23,18 +23,19 @@ repository:
 
 .. code-block:: bash
 
-    pip install git+https://github.com/Holzhaus/sphinx-multiversion.git
+    pip install git+https://github.com/sphinx-contrib/multiversion.git
 
-Install via :file:`setup.py`
-============================
+Install from local clone
+========================
 
-It's also possible to clone the Git repository and install the extension using its :file:`setup.py`:
+It's also possible to clone the Git repository and install the extension from
+the local clone.
 
 .. code-block:: bash
 
-    git clone https://github.com/Holzhaus/sphinx-multiversion.git
-    cd sphinx-multiversion
-    python setup.py install
+    git clone https://github.com/sphinx-contrib/multiversion.git
+    cd multiversion
+    pip install .
 
 
 .. _pip: https://pip.pypa.io/en/stable/
