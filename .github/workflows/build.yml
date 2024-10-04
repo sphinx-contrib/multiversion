@@ -41,7 +41,7 @@ jobs:
         cp assets/gh-pages-redirect.html html/index.html
 
     - name: Upload the Docs
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-pages-artifact@v3
       if: matrix.os == 'ubuntu-latest' && matrix.version == '3.12'
       with:
         name: docs
