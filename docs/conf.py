@@ -11,11 +11,10 @@ copyright = "{}, {}".format(time.strftime("%Y"), author)
 
 html_theme = "alabaster"
 html_theme_options = {
-    "github_repo": "sphinx-multiversion",
-    "github_user": "Holzhaus",
+    "github_repo": "multiversion",
+    "github_user": "sphinx-contrib",
     "github_banner": True,
     "github_button": True,
-    "travis_button": True,
     "show_relbar_bottom": True,
 }
 html_last_updated_fmt = "%c"
