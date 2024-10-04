@@ -38,6 +38,7 @@ jobs:
         mkdir html
         git fetch --all
         python -I -m sphinx_multiversion -W docs html
+        cp assets/gh-pages-redirect.html html/index.html
 
     - name: Upload the Docs
       uses: actions/upload-artifact@v4
