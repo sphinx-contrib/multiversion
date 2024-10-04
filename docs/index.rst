@@ -1,5 +1,5 @@
 =============================
-sphinx-multiversion |version|
+sphinx-multiversion |release|
 =============================
 
 A Sphinx extension for building self-hosted versioned documentation.
