@@ -1,0 +1,5 @@
+[general]
+license = "BSD-2-Clause"
+copyright_holder = "Jan Holthuis <jan.holthuis@rub.de>"
+prefer_inline = true
+width = 79

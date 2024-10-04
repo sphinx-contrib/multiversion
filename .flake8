@@ -1,5 +1,0 @@
-[flake8]
-# E203 is not PEP8 compliant and is not compatible with black:
-# https://black.readthedocs.io/en/stable/the_black_code_style.html#slices
-# The same goes of E231 and W503 conflicts with black, too.
-ignore = E203,E231,W503

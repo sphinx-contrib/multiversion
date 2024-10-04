@@ -38,5 +38,17 @@ include = [
     "/sphinx_multiversion",
 ]
 
+[tool.bandit]
+skips = [
+    # Asserts are actually fine for checking the developer's assumptions, we
+    # "just" mustn't rely these assert in production code.
+    "B101",
+    # We need `subprocess` module.
+    "B404",
+    # As long as we don't use `shell=True` when spawning a subprocess, this
+    # should be fine.
+    "B603",
+]
+
 [tool.ruff]
 line-length = 79
