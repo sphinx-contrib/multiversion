@@ -130,4 +130,4 @@ For answers to common questions about this code of conduct, see the FAQ at
 [Mozilla CoC]: https://github.com/mozilla/diversity
 [FAQ]: https://www.contributor-covenant.org/faq
 [translations]: https://www.contributor-covenant.org/translations
-[github-report]: (https://docs.github.com/en/communities/maintaining-your-safety-on-github/reporting-abuse-or-spam)
+[github-report]: https://docs.github.com/en/communities/maintaining-your-safety-on-github/reporting-abuse-or-spam
