@@ -1,0 +1,34 @@
+name: deploy-pypi
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  build:
+    if: github.ref_protected == true
+    uses: ./.github/workflows/build.yml
+
+  deploy-pypi:
+    if: github.ref_protected == true
+    needs: [build]
+    strategy:
+      matrix:
+        environment: [test.pypi, pypi]
+    name: Deploy Distribution to ${{ matrix.environment }}.org
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ matrix.environment }}
+      url: https://${{ matrix.environment }}.org/p/sphinx-multiversion
+    permissions:
+      id-token: write
+
+    steps:
+    - name: Download the Distributions
+      uses: actions/download-artifact@v4 # eventually rely on artifacts uploaded to the draft release
+      with:
+        name: python-package-distributions
+        path: dist/
+
+    - name: Publish Distributions to ${{ matrix.environment }}.org
+      uses: pypa/gh-action-pypi-publish@f7600683efdcb7656dec5b29656edb7bc586e597

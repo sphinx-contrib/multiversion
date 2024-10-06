@@ -1,7 +1,6 @@
 name: build
 
 on:
-  push:
   pull_request:
   workflow_call:
 
@@ -9,14 +8,18 @@ jobs:
   build:
     name: Build and Test Package
     strategy:
-          matrix:
-            version:
-              - '3.8'
-              - '3.9'
-              - '3.10'
-              - '3.11'
-              - '3.12'
-            os: [ubuntu-latest, windows-latest]
+      matrix:
+        version:
+          - '3.8'
+          - '3.9'
+          - '3.10'
+          - '3.11'
+          - '3.12'
+        os: [ubuntu-latest, windows-latest]
+        include:
+          - version: '3.12'
+            os: ubuntu-latest
+            upload: true
     runs-on: ${{ matrix.os }}
 
     steps:
@@ -41,7 +44,7 @@ jobs:
 
     - name: Upload the Docs
       uses: actions/upload-pages-artifact@v3
-      if: matrix.os == 'ubuntu-latest' && matrix.version == '3.12'
+      if: matrix.upload
       with:
         path: html/
 
@@ -52,50 +55,8 @@ jobs:
       run: python3 -m build
 
     - name: Store the distribution packages
-      if: matrix.os == 'ubuntu-latest' && matrix.version == '3.12'
+      if: matrix.upload
       uses: actions/upload-artifact@v4
       with:
         name: python-package-distributions
         path: dist/
-
-  deploy-testpypi:
-    name: Deploy Distribution to Test PyPI
-    if: false  # Currently disabled
-    needs: [build]
-    runs-on: ubuntu-latest
-    environment:
-      name: testpypi
-      url: https://test.pypi.org/p/sphinx-multiversion
-    permissions:
-      id-token: write
-
-    steps:
-    - name: Download the Distributions
-      uses: actions/download-artifact@v4
-      with:
-        name: python-package-distributions
-        path: dist/
-
-    - name: Publish Distributions to Test PyPI
-      uses: pypa/gh-action-pypi-publish@release/v1
-
-  deploy-pypi:
-    name: Deploy Distribution to PyPI
-    if: startsWith(github.ref, 'refs/tags/')
-    needs: [build]
-    runs-on: ubuntu-latest
-    environment:
-      name: pypi
-      url: https://pypi.org/p/sphinx-multiversion
-    permissions:
-      id-token: write
-
-    steps:
-    - name: Download the Distributions
-      uses: actions/download-artifact@v4
-      with:
-        name: python-package-distributions
-        path: dist/
-
-    - name: Publish Distributions to PyPI
-      uses: pypa/gh-action-pypi-publish@release/v1
