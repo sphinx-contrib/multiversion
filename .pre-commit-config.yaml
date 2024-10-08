@@ -71,9 +71,6 @@ repos:
     description: "Check if version is consistent in all source files"
     entry: .pre-commit/version_check.py
     pass_filenames: false
-    stages:
-    - pre-commit
-    - manual
     language: python
     files: ^(\.pre-commit/version_check\.py|setup\.py|sphinx_multiversion/__init__\.py|docs/conf\.py|docs/changelog\.rst)$
     additional_dependencies:
@@ -86,8 +83,5 @@ repos:
     language: python
     types:
     - python
-    stages:
-    - pre-commit
-    - manual
     additional_dependencies:
     - sphinx
