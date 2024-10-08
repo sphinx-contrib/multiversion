@@ -1,6 +1,6 @@
 repos:
 - repo: https://github.com/pre-commit/pre-commit-hooks
-  rev: v4.6.0
+  rev: v5.0.0
   hooks:
     - id: check-added-large-files
       args: ["--maxkb=500"]
@@ -61,7 +61,7 @@ repos:
     args: ["-c", "pyproject.toml", "--"]
     additional_dependencies: ["bandit[toml]"]
 - repo: https://github.com/gitleaks/gitleaks
-  rev: v8.20.0
+  rev: v8.20.1
   hooks:
     - id: gitleaks
 - repo: local
@@ -72,7 +72,7 @@ repos:
     entry: .pre-commit/version_check.py
     pass_filenames: false
     stages:
-    - commit
+    - pre-commit
     - manual
     language: python
     files: ^(\.pre-commit/version_check\.py|setup\.py|sphinx_multiversion/__init__\.py|docs/conf\.py|docs/changelog\.rst)$
@@ -87,7 +87,7 @@ repos:
     types:
     - python
     stages:
-    - commit
+    - pre-commit
     - manual
     additional_dependencies:
     - sphinx
