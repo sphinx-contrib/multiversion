@@ -29,6 +29,9 @@ This is what the default configuration looks like:
     # Determines whether remote or local git branches/tags are preferred if their output dirs conflict
     smv_prefer_remote_refs = False
 
+    # Callable for transforming the list of matching refs (set to None to do no transformation)
+    smv_refs_filter_fn = None
+
 You can override all of these values inside your :file:`conf.py`.
 
 .. note::
@@ -104,6 +107,32 @@ Here are some examples:
 .. seealso::
 
     Have a look at `PyFormat <python_format_>`_ for information how to use new-style Python formatting.
+
+
+Arbitrary filtering of git refs
+===============================
+
+In some cases the regexes above may be insufficient to determine which git refs to build, for instance to build only the most recent N builds. For those cases the ``smv_refs_filter_fn`` setting may be set to a Python function which filters, sorts, and transforms the list of matching git refs.
+
+For example:
+
+.. code-block:: python
+
+    # Keep main and the most recent 5 releases
+    def git_ref_filter(git_refs):
+      main_ref = None
+      release_refs = []
+      for git_ref in git_refs:
+        if git_ref.name == "main":
+          main_ref = git_ref
+        elif "release" in git_ref.name:
+          release_refs.append(git_ref)
+
+      release_refs = sorted(release_refs, key=git_ref_to_semver)[-5:]
+
+      return [main_ref] + release_refs
+
+    smv_refs_filter_fn = git_ref_filter
 
 
 Overriding Configuration Variables
