@@ -44,6 +44,7 @@ DEFAULT_BRANCH_WHITELIST = r"^.*$"
 DEFAULT_REMOTE_WHITELIST = None
 DEFAULT_RELEASED_PATTERN = r"^tags/.*$"
 DEFAULT_OUTPUTDIR_FORMAT = r"{ref.name}"
+DEFAULT_TOPLEVELREF = None
 
 Version = collections.namedtuple(
     "Version",
@@ -247,6 +248,9 @@ def setup(app):
     )
     app.add_config_value(
         "smv_outputdir_format", DEFAULT_OUTPUTDIR_FORMAT, "html"
+    )
+    app.add_config_value(
+        "smv_toplevelref", DEFAULT_TOPLEVELREF, "html"
     )
     app.connect("config-inited", config_inited)
 
