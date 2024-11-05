@@ -53,6 +53,7 @@ Version = collections.namedtuple(
         "version",
         "release",
         "is_released",
+        "creatordate",
     ],
 )
 
@@ -71,6 +72,7 @@ class VersionInfo:
             version=v["version"],
             release=v["release"],
             is_released=v["is_released"],
+            creatordate=v["creatordate"],
         )
 
     @property
