@@ -288,7 +288,7 @@ def main(argv=None):
             )
 
             if gitref.name == config.smv_toplevelref:
-                outputdir = ''
+                outputdir = ""
 
             if outputdir in outputdirs:
                 logger.warning(
