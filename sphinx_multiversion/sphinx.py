@@ -167,6 +167,13 @@ class VersionInfo:
         )
 
 
+def format_date(value, format="%Y-%m-%d"):
+    date_obj = datetime.datetime.strptime(
+        value, DATE_FMT
+    )  # Convert the date string to a datetime object
+    return date_obj.strftime(format)  # Format to desired output
+
+
 def html_page_context(app, pagename, templatename, context, doctree):
     versioninfo = VersionInfo(
         app, context, app.config.smv_metadata, app.config.smv_current_version
@@ -178,6 +185,9 @@ def html_page_context(app, pagename, templatename, context, doctree):
     context["current_version"] = versioninfo[app.config.smv_current_version]
     context["latest_version"] = versioninfo[app.config.smv_latest_version]
     context["html_theme"] = app.config.html_theme
+
+    # Add a filter to format the date
+    app.builder.templates.environment.filters["format_date"] = format_date
 
 
 def config_inited(app, config):
