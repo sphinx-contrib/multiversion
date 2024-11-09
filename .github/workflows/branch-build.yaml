@@ -1,0 +1,24 @@
+name: Build branch
+
+on:
+  push:
+    branches: [main, 'release/v*']
+  pull_request:
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        python-version:
+          - '3.8'
+          - '3.9'
+          - '3.10'
+          - '3.11'
+          - '3.12'
+        os: [ubuntu-latest, windows-latest]
+    uses: ./.github/workflows/build.yaml
+    with:
+      runs-on: ${{ matrix.os }}
+      python-version: ${{ matrix.python-version }}
+      upload-build-artifacts: ${{ matrix.upload == true }}
+      upload-documentation-artifacts: ${{ matrix.upload == true }}

@@ -2,9 +2,8 @@ name: Deploy docs to Github Pages
 
 on:
   push:
-    branches: [main]
-    tags:
-      - 'v*'
+    branches: [main, 'release/v*']
+    tags: ['v*']
 
 # Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
 # However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
@@ -14,8 +13,12 @@ concurrency:
 
 jobs:
   build:
-    if: github.ref_protected == true
-    uses: ./.github/workflows/build.yml
+    uses: ./.github/workflows/build.yaml
+    with:
+      # Always use the default branch for building the documentation
+      # Otherwise, we might build our documentation with an old SMV version
+      ref: ${{ github.event.repository.default_branch }}
+      upload-artifacts: true
 
   deploy-docs:
     name: Deploy Docs to GitHub Pages

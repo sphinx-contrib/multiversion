@@ -1,0 +1,64 @@
+name: Build
+
+on:
+  workflow_call:
+    inputs:
+      ref:
+        type: string
+      runs-on:
+        type: string
+        default: 'ubuntu-latest'
+      python-version:
+        type: string
+        default: '3.12'
+      upload-documentation-artifacts:
+        type: boolean
+        default: false
+      upload-build-artifacts:
+        type: boolean
+        default: false
+
+jobs:
+  build:
+    name: ${{ github.event.inputs.runs-on }} python-${{ github.event.inputs.python-version }}
+    runs-on: ${{ github.event.inputs.runs-on }}
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{ github.event.inputs.ref }}
+        fetch-tags: true
+    - uses: actions/setup-python@v5
+      with:
+        python-version: ${{ github.event.inputs.python-version }}
+
+    - name: Install packages
+      run: pip install .
+
+    - name: Run tests
+      run: python -m unittest discover -v
+
+    - name: Build documentation
+      run: |-
+        mkdir html
+        python -I -m sphinx_multiversion -W docs html
+        cp assets/gh-pages-redirect.html html/index.html
+
+    - name: Upload documentation artifacts
+      if: github.event.inputs.upload-artifacts
+      uses: actions/upload-pages-artifact@v3
+      with:
+        path: html/
+
+    - name: Install pypa/build
+      run: pip install build
+
+    - name: Build a binary wheel and a source tarball
+      run: python3 -m build
+
+    - name: Upload build artifacts
+      if: github.event.inputs.upload-build-artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: python-package-distributions
+        path: dist/
