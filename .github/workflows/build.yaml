@@ -1,33 +1,35 @@
-name: build
+name: Build
 
 on:
-  pull_request:
   workflow_call:
+    inputs:
+      ref:
+        type: string
+      runs-on:
+        type: string
+        default: 'ubuntu-latest'
+      python-version:
+        type: string
+        default: '3.12'
+      upload-documentation-artifacts:
+        type: boolean
+        default: false
+      upload-build-artifacts:
+        type: boolean
+        default: false
 
 jobs:
   build:
-    name: Build and Test Package
-    strategy:
-      matrix:
-        version:
-          - '3.8'
-          - '3.9'
-          - '3.10'
-          - '3.11'
-          - '3.12'
-        os: [ubuntu-latest, windows-latest]
-        include:
-          - version: '3.12'
-            os: ubuntu-latest
-            upload: true
-    runs-on: ${{ matrix.os }}
+    name: ${{ inputs.runs-on }} python-${{ inputs.python-version }}
+    runs-on: ${{ inputs.runs-on }}
 
     steps:
     - uses: actions/checkout@v4
-    - name: Set up Python ${{ matrix.version }}
-      uses: actions/setup-python@v5
       with:
-        python-version: ${{ matrix.version }}
+        ref: ${{ inputs.ref }}
+    - uses: actions/setup-python@v5
+      with:
+        python-version: ${{ inputs.python-version }}
 
     - name: Install packages
       run: pip install .
@@ -42,9 +44,9 @@ jobs:
         python -I -m sphinx_multiversion -W docs html
         cp assets/gh-pages-redirect.html html/index.html
 
-    - name: Upload the Docs
+    - name: Upload documentation artifacts
+      if: inputs.upload-documentation-artifacts
       uses: actions/upload-pages-artifact@v3
-      if: matrix.upload
       with:
         path: html/
 
@@ -54,8 +56,8 @@ jobs:
     - name: Build a binary wheel and a source tarball
       run: python3 -m build
 
-    - name: Store the distribution packages
-      if: matrix.upload
+    - name: Upload build artifacts
+      if: inputs.upload-build-artifacts
       uses: actions/upload-artifact@v4
       with:
         name: python-package-distributions

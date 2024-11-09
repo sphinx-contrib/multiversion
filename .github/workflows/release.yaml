@@ -1,0 +1,61 @@
+name: deploy-pypi
+
+on:
+  push:
+    tags: ['v*']
+
+jobs:
+  build:
+    name: Build the package
+    if: github.ref_protected == true
+    uses: ./.github/workflows/build.yaml
+    with:
+      upload-build-artifacts: true
+
+  deploy-pypi:
+    name: Deploy the package to ${{ matrix.environment }}.org
+    if: github.ref_protected == true
+    needs: [build]
+    strategy:
+      matrix:
+        environment: [test.pypi, pypi]
+        include:
+          - environment: pypi
+            repository: https://upload.pypi.org/legacy/
+          - environment: test.pypi
+            repository: https://test.pypi.org/legacy/
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ matrix.environment }}
+      url: https://${{ matrix.environment }}.org/p/sphinx-multiversion
+    permissions:
+      id-token: write
+
+    steps:
+      - name: Download the build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: python-package-distributions
+          path: dist/
+
+      - name: Publish Distributions to ${{ matrix.environment }}.org
+        uses: pypa/gh-action-pypi-publish@fb13cb306901256ace3dab689990e13a5550ffaa
+        with:
+          repository-url: ${{ matrix.repository }}
+
+  create-release:
+    name: Create the GitHub Release
+    if: github.ref_protected == true
+    needs: [build]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download the build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: python-package-distributions
+          path: dist/
+      - name: Create the release draft with the build artifacts
+        uses: softprops/action-gh-release@e7a8f85e1c67a31e6ed99a94b41bd0b71bbee6b8
+        with:
+          draft: true
+          files: dist/*
