@@ -18,7 +18,7 @@ jobs:
       # Always use the default branch for building the documentation
       # Otherwise, we might build our documentation with an old SMV version
       ref: ${{ github.event.repository.default_branch }}
-      upload-artifacts: true
+      upload-documentation-artifacts: true
 
   deploy-docs:
     name: Deploy Docs to GitHub Pages
