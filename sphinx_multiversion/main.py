@@ -92,6 +92,12 @@ def load_sphinx_config_worker(q, confpath, confoverrides, add_defaults):
                 "html",
                 str,
             )
+            current_config.add(
+                "smv_toplevelref",
+                sphinx.DEFAULT_TOPLEVELREF,
+                "html",
+                str,
+            )
             current_config.add("smv_prefer_remote_refs", False, "html", bool)
         current_config.pre_init_values()
         current_config.init_values()
@@ -280,6 +286,10 @@ def main(argv=None):
                 ref=gitref,
                 config=current_config,
             )
+
+            if gitref.name == config.smv_toplevelref:
+                outputdir = ""
+
             if outputdir in outputdirs:
                 logger.warning(
                     "outputdir '%s' for %s conflicts with other versions",
