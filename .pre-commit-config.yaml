@@ -33,13 +33,13 @@ repos:
     - id: sort-simple-yaml
     - id: trailing-whitespace
 - repo: https://github.com/astral-sh/ruff-pre-commit
-  rev: v0.9.3
+  rev: v0.9.4
   hooks:
     - id: ruff
       args: [ --fix ]
     - id: ruff-format
 - repo: https://github.com/codespell-project/codespell
-  rev: v2.4.0
+  rev: v2.4.1
   hooks:
   - id: codespell
     args: [
@@ -61,7 +61,7 @@ repos:
     args: ["-c", "pyproject.toml", "--"]
     additional_dependencies: ["bandit[toml]"]
 - repo: https://github.com/gitleaks/gitleaks
-  rev: v8.23.2
+  rev: v8.23.3
   hooks:
     - id: gitleaks
 - repo: local
