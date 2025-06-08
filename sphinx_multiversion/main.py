@@ -294,9 +294,8 @@ def main(argv=None):
             if isinstance(source_suffixes, str):
                 source_suffixes = [current_config.source_suffix]
 
-            current_sourcedir = os.path.join(repopath, sourcedir)
             project = sphinx_project.Project(
-                current_sourcedir, source_suffixes
+                sourcedir, source_suffixes
             )
             metadata[gitref.name] = {
                 "name": gitref.name,
@@ -309,7 +308,7 @@ def main(argv=None):
                 "source": gitref.source,
                 "creatordate": gitref.creatordate.strftime(sphinx.DATE_FMT),
                 "basedir": repopath,
-                "sourcedir": current_sourcedir,
+                "sourcedir": sourcedir,
                 "outputdir": os.path.join(
                     os.path.abspath(args.outputdir), outputdir
                 ),
