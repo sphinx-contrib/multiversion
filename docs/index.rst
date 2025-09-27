@@ -24,5 +24,6 @@ Project Links
     :caption: Appendix
 
     github_pages
+    gitlab_pages
     faq
     changelog
