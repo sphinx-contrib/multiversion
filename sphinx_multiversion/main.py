@@ -38,6 +38,7 @@ import string
 import subprocess
 import sys
 import tempfile
+from typing import Optional, Callable
 
 from sphinx import config as sphinx_config
 from sphinx import project as sphinx_project
@@ -93,6 +94,9 @@ def load_sphinx_config_worker(q, confpath, confoverrides, add_defaults):
                 str,
             )
             current_config.add("smv_prefer_remote_refs", False, "html", bool)
+            current_config.add(
+                "smv_refs_filter_fn", None, "html", Optional[Callable]
+            )
         current_config.pre_init_values()
         current_config.init_values()
     except Exception as err:
@@ -102,14 +106,21 @@ def load_sphinx_config_worker(q, confpath, confoverrides, add_defaults):
     q.put(current_config)
 
 
-def load_sphinx_config(confpath, confoverrides, add_defaults=False):
+def load_sphinx_config(
+    confpath, confoverrides, add_defaults=False, in_process=False
+):
     q = multiprocessing.Queue()
-    proc = multiprocessing.Process(
-        target=load_sphinx_config_worker,
-        args=(q, confpath, confoverrides, add_defaults),
-    )
-    proc.start()
-    proc.join()
+    target = load_sphinx_config_worker
+    args = (q, confpath, confoverrides, add_defaults)
+    if in_process:
+        target(*args)
+    else:
+        proc = multiprocessing.Process(
+            target=target,
+            args=args,
+        )
+        proc.start()
+        proc.join()
     result = q.get_nowait()
     if isinstance(result, Exception):
         raise result
@@ -207,7 +218,10 @@ def main(argv=None):
 
     # Parse config
     config = load_sphinx_config(
-        confdir_absolute, confoverrides, add_defaults=True
+        confdir_absolute,
+        confoverrides,
+        add_defaults=True,
+        in_process=True,
     )
 
     # Get relative paths to root of git repository
@@ -243,6 +257,9 @@ def main(argv=None):
         gitrefs = sorted(gitrefs, key=lambda x: (not x.is_remote, *x))
     else:
         gitrefs = sorted(gitrefs, key=lambda x: (x.is_remote, *x))
+
+    if config.smv_refs_filter_fn is not None:
+        gitrefs = config.smv_refs_filter_fn(gitrefs)
 
     logger = logging.getLogger(__name__)
 
