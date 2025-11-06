@@ -44,6 +44,7 @@ DEFAULT_BRANCH_WHITELIST = r"^.*$"
 DEFAULT_REMOTE_WHITELIST = None
 DEFAULT_RELEASED_PATTERN = r"^tags/.*$"
 DEFAULT_OUTPUTDIR_FORMAT = r"{ref.name}"
+DEFAULT_TOPLEVELREF = None
 
 Version = collections.namedtuple(
     "Version",
@@ -53,6 +54,7 @@ Version = collections.namedtuple(
         "version",
         "release",
         "is_released",
+        "creatordate",
     ],
 )
 
@@ -71,6 +73,7 @@ class VersionInfo:
             version=v["version"],
             release=v["release"],
             is_released=v["is_released"],
+            creatordate=v["creatordate"],
         )
 
     @property
@@ -165,6 +168,13 @@ class VersionInfo:
         )
 
 
+def format_date(value, format="%Y-%m-%d"):
+    date_obj = datetime.datetime.strptime(
+        value, DATE_FMT
+    )  # Convert the date string to a datetime object
+    return date_obj.strftime(format)  # Format to desired output
+
+
 def html_page_context(app, pagename, templatename, context, doctree):
     versioninfo = VersionInfo(
         app, context, app.config.smv_metadata, app.config.smv_current_version
@@ -176,6 +186,9 @@ def html_page_context(app, pagename, templatename, context, doctree):
     context["current_version"] = versioninfo[app.config.smv_current_version]
     context["latest_version"] = versioninfo[app.config.smv_latest_version]
     context["html_theme"] = app.config.html_theme
+
+    # Add a filter to format the date
+    app.builder.templates.environment.filters["format_date"] = format_date
 
 
 def config_inited(app, config):
@@ -236,6 +249,7 @@ def setup(app):
     app.add_config_value(
         "smv_outputdir_format", DEFAULT_OUTPUTDIR_FORMAT, "html"
     )
+    app.add_config_value("smv_toplevelref", DEFAULT_TOPLEVELREF, "html")
     app.connect("config-inited", config_inited)
 
     return {
