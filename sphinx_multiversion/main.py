@@ -253,6 +253,7 @@ def main(argv=None):
         for gitref in gitrefs:
             # Clone Git repo
             repopath = os.path.join(tmp, gitref.commit)
+            commit = str(gitref.commit)
             try:
                 git.copy_tree(str(gitroot), gitroot.as_uri(), repopath, gitref)
             except (OSError, subprocess.CalledProcessError):
@@ -315,6 +316,7 @@ def main(argv=None):
                 ),
                 "confdir": confpath,
                 "docnames": list(project.discover()),
+                "commit": commit
             }
 
         if args.dump_metadata:
@@ -373,6 +375,7 @@ def main(argv=None):
                     "SPHINX_MULTIVERSION_SOURCEDIR": data["sourcedir"],
                     "SPHINX_MULTIVERSION_OUTPUTDIR": data["outputdir"],
                     "SPHINX_MULTIVERSION_CONFDIR": data["confdir"],
+                    "SPHINX_MULTIVERSION_GIT_COMMIT": data["commit"],
                 }
             )
             subprocess.check_call(cmd, cwd=current_cwd, env=env)
