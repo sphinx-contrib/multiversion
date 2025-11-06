@@ -81,6 +81,16 @@ Here are some examples:
 
         git for-each-ref --format "%(refname)"
 
+Pre and post-build command
+================
+
+In some cases it may be necessary to run a command in the checked out directory before or after building with sphinx. For example if you are using ``sphinx-apidoc`` to generate the autodoc api source files.
+
+The options ``smv_prebuild_command`` and ``smv_postbuild_command`` are provided.
+
+For example:
+
+    smv_prebuild_command = "sphinx-apidoc -o docs/api mymodule"
 
 Output Directory Format
 =======================
