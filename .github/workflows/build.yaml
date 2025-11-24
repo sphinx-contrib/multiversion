@@ -46,7 +46,7 @@ jobs:
 
     - name: Upload documentation artifacts
       if: inputs.upload-documentation-artifacts
-      uses: actions/upload-pages-artifact@v3
+      uses: actions/upload-pages-artifact@v4
       with:
         path: html/
 
