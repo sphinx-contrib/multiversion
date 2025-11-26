@@ -54,9 +54,13 @@ def get_toplevel_path(cwd=None):
         "git",
         "rev-parse",
         "--show-toplevel",
+        "--show-superproject-working-tree",
     )
     output = subprocess.check_output(cmd, cwd=cwd).decode()
-    return output.rstrip("\n")
+    # If this is a git submodule of a super project then we'll have two lines
+    # of output, otherwise one. Since the superproject flag is second in the
+    # command above the superproject will always be the last line if present.
+    return output.split()[-1]
 
 
 def get_all_refs(gitroot):
