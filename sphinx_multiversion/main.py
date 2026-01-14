@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (c) 2025 Jan Holthuis <jan.holthuis@rub.de>
+# Copyright (c) 2026 Jan Holthuis <jan.holthuis@rub.de>
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
@@ -41,6 +41,7 @@ import tempfile
 
 from sphinx import config as sphinx_config
 from sphinx import project as sphinx_project
+from sphinx.util.tags import Tags
 
 from . import sphinx
 from . import git
@@ -61,7 +62,8 @@ def load_sphinx_config_worker(q, confpath, confoverrides, add_defaults):
         with working_dir(confpath):
             current_config = sphinx_config.Config.read(
                 confpath,
-                confoverrides,
+                overrides=confoverrides,
+                tags=Tags(),
             )
 
         if add_defaults:
