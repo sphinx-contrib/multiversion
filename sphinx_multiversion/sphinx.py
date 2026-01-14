@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (c) 2025 Jan Holthuis <jan.holthuis@rub.de>
+# Copyright (c) 2026 Jan Holthuis <jan.holthuis@rub.de>
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
@@ -204,7 +204,9 @@ def config_inited(app, config):
     app.connect("html-page-context", html_page_context)
 
     # Restore config values
-    old_config = sphinx_config.Config.read(data["confdir"], overrides={}, tags=Tags())
+    old_config = sphinx_config.Config.read(
+        data["confdir"], overrides={}, tags=Tags()
+    )
     old_config.pre_init_values()
     old_config.init_values()
     config.version = data["version"]
